@@ -102,12 +102,18 @@ the overrides does not remove it from a machine that already has it.
 `env.CLAUDE_CODE_SHELL` holds a path that may not exist on every machine,
 in which case Claude Code picks a shell itself.
 
-After changing the docs checker or the settings merge, run their tests:
+After changing the docs checker, the settings merge or a setup script, run
+its tests:
 
 ```sh
 python3 -m unittest discover -s skills/documentation/scripts
 python3 -m unittest discover -s claude
+python3 -m unittest test_setup
 ```
+
+`test_setup.ps1` does the same for `setup.ps1` on Windows. CI runs all of
+them on every push to `main`, the Windows one under both Windows PowerShell
+and PowerShell 7.
 
 ## Credits
 
