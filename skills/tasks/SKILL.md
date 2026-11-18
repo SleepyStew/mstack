@@ -56,7 +56,7 @@ finished, meaning their files are gone. Take `priority: high` first and
    another one, so read it from every branch:
 
    ```sh
-   git grep '^status:' $(git branch -a --format='%(refname:short)') -- tasks/<slug>.md
+   git grep '^status:' $(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes) -- tasks/<slug>.md
    ```
 
    A branch that shows `doing` has the task.
