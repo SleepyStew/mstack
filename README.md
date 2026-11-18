@@ -26,6 +26,7 @@ Claude Code settings.
 | `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`. |
 | `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
 | `skills/review-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
+| `skills/plan-with-me` | Interviewing me in rounds of questions until we agree on what to build, ending in a summary I confirm. |
 
 `global/AGENTS.md` holds only what applies to almost every session. Anything
 narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
@@ -107,6 +108,7 @@ python3 -m unittest discover -s claude
 
 ## Credits
 
-Some skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack)
-and [tstack](https://github.com/t3dotgg/tstack). [CREDITS.md](CREDITS.md)
+Some skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack),
+[tstack](https://github.com/t3dotgg/tstack), [Matt Pocock's skills](https://github.com/mattpocock/skills)
+and [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills). [CREDITS.md](CREDITS.md)
 lists what came from where, with their licence.
