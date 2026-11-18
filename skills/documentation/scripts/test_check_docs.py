@@ -47,6 +47,12 @@ class CheckDocs(unittest.TestCase):
         )
         self.assertEqual(check(root), ([], []))
 
+    def test_fence_inside_a_longer_fence_does_not_end_the_block(self):
+        root = self.repo(
+            {"docs/README.md": "````markdown\n```sh\n[x](nope.md)\n```\n````\n\n~~~\n```\n[y](nope.md)\n~~~\n\n[z](gone.md)\n"}
+        )
+        self.assertEqual(check(root)[0], ["docs/README.md:12: broken link gone.md"])
+
     def test_guide_and_folder_missing_from_index(self):
         root = self.repo(
             {

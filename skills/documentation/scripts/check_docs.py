@@ -16,7 +16,7 @@ from urllib.parse import unquote
 
 LINK = re.compile(r"!?\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 HEADING = re.compile(r"^#{1,6}\s+(.*?)\s*#*\s*$")
-FENCE = re.compile(r"^\s*(```|~~~)")
+FENCE = re.compile(r"^\s*(`{3,}|~{3,})(.*)")
 INLINE_CODE = re.compile(r"`[^`]*`")
 EXTERNAL = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
 DATED = re.compile(r"\d{4}-\d{2}-\d{2}")
@@ -28,12 +28,18 @@ INDEX_THRESHOLD = 3
 
 def prose_lines(text):
     """Yield (line number, line) for lines outside fenced code blocks."""
-    fenced = False
+    opener = None
     for number, line in enumerate(text.splitlines(), 1):
-        if FENCE.match(line):
-            fenced = not fenced
-        elif not fenced:
-            yield number, line
+        match = FENCE.match(line)
+        if opener is None:
+            if match:
+                opener = match.group(1)
+            else:
+                yield number, line
+        # A block closes on a bare fence of the same character, at least as
+        # long as the one that opened it, so a shorter fence can sit inside.
+        elif match and match.group(1).startswith(opener) and not match.group(2).strip():
+            opener = None
 
 
 def slug(heading):
