@@ -50,7 +50,6 @@ link_skills() {
 # merge_settings <harness dir>
 merge_settings() {
   local home="$1" result
-  command -v python3 >/dev/null 2>&1 || { echo "python3 is needed to merge the settings overrides." >&2; exit 1; }
   result="$(python3 "$repo/claude/merge_settings.py" "$repo/claude/settings-overrides.json" \
     "$home/settings.json" "$home/mstack-backup/$stamp" "$repo/claude/settings.json")"
   printf '  %-7s %s\n' "$result" "$home/settings.json"
@@ -65,6 +64,8 @@ claude_home="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 
 if installed claude "$claude_home"; then
+  # Checked before the first change, so a machine without it is not left half set up.
+  command -v python3 >/dev/null 2>&1 || { echo "python3 is needed to merge the settings overrides." >&2; exit 1; }
   echo "Claude Code ($claude_home)"
   link "$repo/global/AGENTS.md" "$claude_home/CLAUDE.md" "$claude_home"
   merge_settings "$claude_home"
