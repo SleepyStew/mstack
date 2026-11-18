@@ -16,11 +16,10 @@ class MergeSettings(unittest.TestCase):
         self.overrides = self.root / "overrides.json"
         self.settings = self.root / "home" / "settings.json"
         self.backup = self.root / "backup"
-        self.old_target = self.root / "clone" / "settings.json"
         self.overrides.write_text(json.dumps({"env": {"A": "1"}, "rules": ["x"]}))
 
     def run_apply(self):
-        return apply(self.overrides, self.settings, self.backup, self.old_target)
+        return apply(self.overrides, self.settings, self.backup)
 
     def read(self):
         return json.loads(self.settings.read_text())
@@ -56,23 +55,14 @@ class MergeSettings(unittest.TestCase):
             self.run_apply()
         self.assertEqual(self.settings.read_text(), "{broken")
 
-    def test_dangling_old_link_becomes_a_file_without_recreating_its_target(self):
+    def test_dangling_link_becomes_a_file_without_creating_its_target(self):
+        target = self.root / "gone.json"
         self.settings.parent.mkdir()
-        self.settings.symlink_to(self.old_target)
+        self.settings.symlink_to(target)
         self.assertEqual(self.run_apply(), "created")
         self.assertFalse(self.settings.is_symlink())
-        self.assertFalse(self.old_target.exists())
+        self.assertFalse(target.exists())
         self.assertEqual(self.read(), {"env": {"A": "1"}, "rules": ["x"]})
-
-    def test_live_old_link_keeps_its_content_and_leaves_the_target_alone(self):
-        self.settings.parent.mkdir()
-        self.old_target.parent.mkdir()
-        self.old_target.write_text('{"theme": "light"}')
-        self.settings.symlink_to(self.old_target)
-        self.assertEqual(self.run_apply(), "merged")
-        self.assertFalse(self.settings.is_symlink())
-        self.assertEqual(self.old_target.read_text(), '{"theme": "light"}')
-        self.assertEqual(self.read(), {"theme": "light", "env": {"A": "1"}, "rules": ["x"]})
 
 
 if __name__ == "__main__":

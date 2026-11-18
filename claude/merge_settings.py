@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Merge mstack's settings overrides into a Claude Code settings.json.
 
-Usage: merge_settings.py <overrides.json> <settings.json> <backup-dir> <old-link-target>
+Usage: merge_settings.py <overrides.json> <settings.json> <backup-dir>
 
 Objects merge key by key. Any other value in the overrides, lists included,
 replaces the one in settings.json. Keys the overrides do not name are kept.
@@ -24,15 +24,11 @@ def merge(base, overrides):
     return merged
 
 
-def apply(overrides_path, settings_path, backup_dir, old_link_target):
+def apply(overrides_path, settings_path, backup_dir):
     """Return "ok", "created" or "merged"."""
     overrides = json.loads(overrides_path.read_text(encoding="utf-8"))
-    # Earlier versions linked settings.json to a file in the clone that no
-    # longer exists. Writing through that link, or any dangling one, would
-    # create a file at its target.
-    old_link = settings_path.is_symlink() and (
-        not settings_path.exists() or Path(settings_path.readlink()) == old_link_target
-    )
+    # Writing through a dangling link would create a file at its target.
+    dangling = settings_path.is_symlink() and not settings_path.exists()
     existed = settings_path.exists()
     base = {}
     if existed:
@@ -43,9 +39,9 @@ def apply(overrides_path, settings_path, backup_dir, old_link_target):
         if not isinstance(base, dict):
             raise SystemExit(f"{settings_path} does not hold a JSON object. Fix it, then run setup again.")
     merged = merge(base, overrides)
-    if merged == base and not old_link:
+    if merged == base and not dangling:
         return "ok"
-    if old_link:
+    if dangling:
         settings_path.unlink()
     elif existed:
         backup_dir.mkdir(parents=True, exist_ok=True)
@@ -56,4 +52,4 @@ def apply(overrides_path, settings_path, backup_dir, old_link_target):
 
 
 if __name__ == "__main__":
-    print(apply(*(Path(arg) for arg in sys.argv[1:5])))
+    print(apply(*(Path(arg) for arg in sys.argv[1:4])))

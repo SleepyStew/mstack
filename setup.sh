@@ -51,7 +51,7 @@ link_skills() {
 merge_settings() {
   local home="$1" result
   result="$(python3 "$repo/claude/merge_settings.py" "$repo/claude/settings-overrides.json" \
-    "$home/settings.json" "$home/mstack-backup/$stamp" "$repo/claude/settings.json")"
+    "$home/settings.json" "$home/mstack-backup/$stamp")"
   printf '  %-7s %s\n' "$result" "$home/settings.json"
 }
 

@@ -95,10 +95,8 @@ function Merge-Settings($HarnessHome) {
     # for a dangling one.
     $linkTarget = if ($isLink) { @($item.Target)[0] } else { $null }
     $existed = if ($isLink) { $linkTarget -and (Test-Path -LiteralPath $linkTarget) } else { [bool]$item }
-    # Earlier versions linked settings.json to a file in the clone that no
-    # longer exists. Writing through that link, or any dangling one, would
-    # create a file at its target.
-    $oldLink = $isLink -and (-not $existed -or (Test-LinkTo $item (Join-Path $repo 'claude\settings.json')))
+    # Writing through a dangling link would create a file at its target.
+    $dangling = $isLink -and -not $existed
     $base = [pscustomobject]@{}
     if ($existed) {
         try {
@@ -112,11 +110,11 @@ function Merge-Settings($HarnessHome) {
     }
     $before = $base | ConvertTo-Json -Depth 100 -Compress
     Merge-Object $base $overrides
-    if (-not $oldLink -and ($base | ConvertTo-Json -Depth 100 -Compress) -ceq $before) {
+    if (-not $dangling -and ($base | ConvertTo-Json -Depth 100 -Compress) -ceq $before) {
         Write-Host "  ok      $target"
         return
     }
-    if ($oldLink) {
+    if ($dangling) {
         $item.Delete()
     } elseif ($existed) {
         $backup = Join-Path $HarnessHome "mstack-backup\$stamp"
