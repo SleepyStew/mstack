@@ -27,6 +27,7 @@ Claude Code settings.
 | `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
 | `skills/review-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
 | `skills/plan-with-me` | Interviewing me in rounds of questions until we agree on what to build, ending in a summary I confirm. |
+| `skills/debugging` | Finding a bug's root cause by building a check that fails on it first, then fixing it where it starts. |
 
 `global/AGENTS.md` holds only what applies to almost every session. Anything
 narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
@@ -115,6 +116,7 @@ Some skills are adapted from these MIT-licensed projects:
 - `plan-with-me` from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills),
   (c) 2026 Matt Pocock, and the `interview-me` skill in
   [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), (c) 2025 Addy Osmani
+- `debugging` from the `diagnosing-bugs` skill in [mattpocock/skills](https://github.com/mattpocock/skills), (c) 2026 Matt Pocock
 
 `cleanup`, `evidence` and `documentation` take ideas from pstack's `correct`,
 `prove-it-works` and `technical-writing` skills and from tstack's
