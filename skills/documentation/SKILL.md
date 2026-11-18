@@ -10,7 +10,7 @@ index maps by task. Keep them few, current and checkable.
 
 ## Layout
 
-```
+```text
 README.md             What the project is and how to run it.
 AGENTS.md / CLAUDE.md Short rules for agents, pointing at docs/README.md.
 docs/README.md        The index: a table from task to guide.

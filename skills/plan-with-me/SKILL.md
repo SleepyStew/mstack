@@ -64,7 +64,7 @@ Write the summary in the user's words where you can, leaving out lines that
 don't apply. Always include "Out of scope", since much disagreement is about
 what is not being built.
 
-```
+```text
 - Outcome:       <one line>
 - For:           <who benefits>
 - Why now:       <what changed>
