@@ -12,6 +12,16 @@ I prefer you ask with your question tool (`AskUserQuestion` in Claude Code) inst
 
 Use plain text instead when the answer has to be free-form (a detailed description), when I'd need to read a lot first (a plan, review or design), or when the tool isn't available.
 
+## Handing work back
+
+When work is ready for my review, show me that it works instead of telling me. This applies once, at handoff, not to updates along the way.
+
+- **Something I can see changed:** a screenshot of the result in the running app, with a before shot when the comparison matters. Use a short recording when the change is a flow, an interaction or motion.
+- **Nothing visible changed** (CLI, API, library, data, refactor): the command you ran and its real output, such as the test that failed before and passes now.
+- **Trivial changes** (copy, docs, comments, config) need no capture.
+
+You have my standing permission to run the app and use browser preview, simulator and recording tools for this without asking. A project's own rules on how to verify still apply. Capture the real app on the code as committed, never a mock-up or a generated picture of a screen. If you can't capture it, write `No screenshot: <reason>` and show the next best check. Keep captures out of the repo. The `evidence` skill has the details.
+
 ## Writing
 
 Use British/Australian spelling in all prose: replies, commit messages, comments, docs and interface text. In code, names from a language, library, API or CSS keep their own spelling (`color`); names you add follow the codebase's convention, or American spelling if it has none. If a project's prose already uses American spelling, follow it and tell me the first time in a session, so I can ask you to switch or convert it.
@@ -27,6 +37,20 @@ Put what you learn about a project (decisions, preferences, gotchas) in its `CLA
 My terminal runs zsh, which may not be what your shell tool runs. In commands for me to run, flag or avoid zsh differences (word splitting of unquoted variables, unmatched globs, array indexing).
 
 Get secrets through T3's `request_secret` tool when available.
+
+## Code
+
+Write less code. Make the smallest change that solves the problem, and look for something to delete or reuse before adding anything.
+
+- Follow the patterns already in the codebase, and reuse what exists before adding a helper, layer or dependency.
+- Build for the case in front of you: no speculative options, abstractions with one use, or compatibility shims for callers that don't exist.
+- Validate at the edges (user input, network, files) and trust the types inside. Don't guard against states that can't happen.
+- Fix a bug where it starts. A guard that hides the symptom isn't a fix.
+- If something outside the task looks wrong, tell me instead of fixing it quietly or ignoring it.
+
+## Comments
+
+Comment only what the code can't say: why it's written this way, an invariant or ordering that must hold, or a quirk of a library or platform. Public API docs and suppressions with a reason are fine. Don't narrate what the code does, label sections, record what changed, leave commented-out code or write notes to the reviewer. When you change code, update or delete the comments beside it, and don't remove an existing comment that explains why.
 
 ## Tests
 
