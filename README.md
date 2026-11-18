@@ -28,6 +28,7 @@ Claude Code settings.
 | `skills/review-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
 | `skills/plan-with-me` | Interviewing me in rounds of questions until we agree on what to build, ending in a summary I confirm. |
 | `skills/debugging` | Finding a bug's root cause by building a check that fails on it first, then fixing it where it starts. |
+| `skills/why` | Explaining why code or a decision is the way it is, from the commits, pull requests and issues behind it. |
 
 `global/AGENTS.md` holds only what applies to almost every session. Anything
 narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
@@ -112,6 +113,7 @@ python3 -m unittest discover -s claude
 Some skills are adapted from these MIT-licensed projects:
 
 - `unslop` from the `unslop` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
+- `why` from the `why` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
 - `review-loop` from the `sol-loop` skill in [tstack](https://github.com/t3dotgg/tstack), (c) 2026 Theo Browne
 - `plan-with-me` from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills),
   (c) 2026 Matt Pocock, and the `interview-me` skill in
