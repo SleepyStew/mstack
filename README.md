@@ -8,6 +8,11 @@ where they exist.
 The aim is less code of higher quality, and agents that show their work
 instead of describing it.
 
+It is set up for my own machines and accounts. To use it, fork it and edit
+`global/AGENTS.md` and `claude/settings-overrides.json` first: setup links
+the first in as your global instructions and merges the second into your
+Claude Code settings.
+
 ## What's here
 
 | Path | What it is |
@@ -18,9 +23,9 @@ instead of describing it.
 | `skills/unslop` | Editing prose to remove AI writing patterns. |
 | `skills/cleanup` | Surveying a repo for slop, proposing a plan, then cleaning up with no change in behaviour. |
 | `skills/improve` | Suggesting and building improvements to a project, one approved change at a time. |
-| `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script. |
+| `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`. |
 | `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
-| `skills/sol-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. |
+| `skills/sol-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
 
 `global/AGENTS.md` holds only what applies to almost every session. Anything
 narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
@@ -31,12 +36,13 @@ Clone the repo anywhere and run the setup script. A person or an agent can
 do this, and it is safe to run again.
 
 ```sh
-gh repo clone SleepyStew/mstack ~/Code/mstack
+git clone https://github.com/SleepyStew/mstack ~/Code/mstack
 ~/Code/mstack/setup.sh
 ```
 
-On Windows, run `setup.ps1` in PowerShell instead. File links there need
-Developer Mode or an elevated shell.
+`setup.sh` needs `python3`. On Windows, run `setup.ps1` in PowerShell
+instead, which does not. File links there need Developer Mode or an
+elevated shell.
 
 The script links these into place, for each harness that is installed:
 
@@ -73,27 +79,24 @@ loaded.
 git -C ~/Code/mstack pull
 ```
 
-The instructions and skills are links into the clone, so a pull updates
-them. Run setup again when a pull adds or removes a skill or changes
+A pull updates the instructions and skills, since they are links into the
+clone. Run setup again when a pull adds or removes a skill or changes
 `claude/settings-overrides.json`: it links the new skill, removes the link
 to the one that went and merges the overrides again.
 
 ## Changing mstack
 
-Edit the files in the clone, commit and push. The instructions and skills
-are installed as links, so an edit in the clone is live at once, and an
-agent's edit tools may refuse to write through the link.
+Edit the files in the clone, commit and push. An edit to the instructions
+or a skill is live at once, though an agent's edit tools may refuse to
+write through the link.
 
-Three things to know about `claude/settings-overrides.json`:
-
-- An edit reaches a machine only when setup runs there.
-- Setup puts its values back on every run, so a setting changed on one
-  machine, for example from `/config`, lasts only if the overrides do not
-  name it. Removing a key from the overrides does not remove it from a
-  machine that already has it.
-- The file is shared by every machine. `env.CLAUDE_CODE_SHELL` holds a path
-  that may not exist elsewhere, in which case Claude Code picks a shell
-  itself.
+`claude/settings-overrides.json` is shared by every machine, and an edit to
+it reaches a machine only when setup runs there. Setup puts its values back
+on every run, so a setting changed on one machine, for example from
+`/config`, lasts only if the overrides do not name it. Removing a key from
+the overrides does not remove it from a machine that already has it.
+`env.CLAUDE_CODE_SHELL` holds a path that may not exist on every machine,
+in which case Claude Code picks a shell itself.
 
 After changing the docs checker or the settings merge, run their tests:
 
@@ -102,17 +105,8 @@ python3 -m unittest discover -s skills/documentation/scripts
 python3 -m unittest discover -s claude
 ```
 
-## Requirements
-
-- An authenticated [GitHub CLI](https://cli.github.com) (`gh`), or plain
-  `git clone` if the repo is public.
-- `python3` for `setup.sh` and the docs checker. `setup.ps1` does not need
-  it.
-- `sol-loop` needs a harness that can run GPT Sol. T3 Code does this with
-  `delegate_task`.
-
 ## Credits
 
 Some skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack)
-and [tstack](https://github.com/t3dotgg/tstack). See
-[credits](CREDITS.md).
+and [tstack](https://github.com/t3dotgg/tstack). [CREDITS.md](CREDITS.md)
+lists what came from where, with their licence.
