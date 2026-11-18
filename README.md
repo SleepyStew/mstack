@@ -108,7 +108,17 @@ python3 -m unittest discover -s claude
 
 ## Credits
 
-Some skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack),
-[tstack](https://github.com/t3dotgg/tstack), [Matt Pocock's skills](https://github.com/mattpocock/skills)
-and [Addy Osmani's agent-skills](https://github.com/addyosmani/agent-skills). [CREDITS.md](CREDITS.md)
-lists what came from where, with their licence.
+Some skills are adapted from these MIT-licensed projects:
+
+- `unslop` from the `unslop` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
+- `review-loop` from the `sol-loop` skill in [tstack](https://github.com/t3dotgg/tstack), (c) 2026 Theo Browne
+- `plan-with-me` from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills),
+  (c) 2026 Matt Pocock, and the `interview-me` skill in
+  [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), (c) 2025 Addy Osmani
+
+`cleanup`, `evidence` and `documentation` take ideas from pstack's `correct`,
+`prove-it-works` and `technical-writing` skills and from tstack's
+`full-send`, without copying their text.
+
+The adapted parts are under the MIT licence in [LICENSE](LICENSE), with the
+copyright lines above.
