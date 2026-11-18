@@ -1,8 +1,9 @@
 # mstack
 
-How I want coding agents to work with me: one file of global instructions
-and a small set of skills. It works in Claude Code and Codex, and uses
-[T3 Code](https://github.com/pingdotgg/t3code) features where they exist.
+How I want coding agents to work with me: one file of global instructions,
+a small set of skills and my Claude Code settings. It works in Claude Code
+and Codex, and uses [T3 Code](https://github.com/pingdotgg/t3code) features
+where they exist.
 
 The aim is less code of higher quality, and agents that show their work
 instead of describing it.
@@ -12,6 +13,7 @@ instead of describing it.
 | Path | What it is |
 | --- | --- |
 | `global/AGENTS.md` | Instructions loaded into every session: how to talk to me, write, code, comment, test, commit and hand work back. |
+| `claude/settings.json` | My Claude Code user settings. |
 | `skills/evidence` | Capturing screenshots, recordings or command output as proof at handoff. |
 | `skills/unslop` | Editing prose to remove AI writing patterns. |
 | `skills/cleanup` | Surveying a repo for slop, proposing a plan, then cleaning up with no change in behaviour. |
@@ -25,53 +27,67 @@ narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
 
 ## Set up
 
-These steps are written for an agent to follow. They are safe to repeat, and
-repeating them is how to update.
+Clone the repo anywhere and run the setup script. A person or an agent can
+do this, and it is safe to run again.
 
-1. **Get the repo.** Clone it, or pull if it is already there.
+```sh
+gh repo clone SleepyStew/mstack ~/Code/mstack
+~/Code/mstack/setup.sh
+```
 
-   ```sh
-   gh repo clone SleepyStew/mstack ~/Code/mstack
-   git -C ~/Code/mstack pull --ff-only
-   ```
+On Windows, run `setup.ps1` in PowerShell instead. File links there need
+Developer Mode or an elevated shell.
 
-2. **Check the global file before replacing it.** The targets are
-   `~/.claude/CLAUDE.md` for Claude Code and `~/.codex/AGENTS.md` for Codex.
-   If a target exists and its first line does not mention mstack, it holds
-   someone's own instructions: show the user the difference and ask before
-   going on.
+The script links these into place, for each harness that is installed:
 
-3. **Install the global file and the skills** for each harness that is
-   present. Run this from the repo root.
+| Link | Points at |
+| --- | --- |
+| `~/.claude/CLAUDE.md` | `global/AGENTS.md` |
+| `~/.claude/settings.json` | `claude/settings.json` |
+| `~/.claude/skills/<name>` | `skills/<name>`, one link per skill |
+| `~/.codex/AGENTS.md` | `global/AGENTS.md` |
+| `~/.codex/skills/<name>` | `skills/<name>`, one link per skill |
 
-   ```sh
-   cd ~/Code/mstack
-   [ -d "$HOME/.claude" ] && cp global/AGENTS.md "$HOME/.claude/CLAUDE.md"
-   [ -d "$HOME/.codex" ] && cp global/AGENTS.md "$HOME/.codex/AGENTS.md"
-   for home in "$HOME/.claude" "$HOME/.codex"; do
-     [ -d "$home" ] || continue
-     for skill in skills/*/; do
-       name=$(basename "$skill")
-       mkdir -p "$home/skills/$name"
-       cp -R "$skill". "$home/skills/$name/"
-     done
-   done
-   ```
+Codex gets the instructions and the skills only. `CLAUDE_CONFIG_DIR` and
+`CODEX_HOME` are respected when set.
 
-   This overwrites the files of skills that share a name with one in mstack
-   and deletes nothing. Other skills in those folders are left alone.
+- **Nothing is deleted.** A file or folder already in the way moves to
+  `mstack-backup/<timestamp>/` inside the same harness folder.
+- **Other skills are left alone.** Only skills that share a name with one
+  here are replaced.
+- **Don't move the clone.** The links hold its path. If you move it, run
+  setup again.
 
-4. **Confirm.** List `~/.claude/skills` or `~/.codex/skills` and check that
-   each skill in the table above is there. New sessions pick the files up.
-   Sessions already running keep the old ones.
+New sessions pick the files up. Sessions already running keep what they
+loaded.
 
-Because nothing is deleted, a skill or file that mstack has dropped stays
-installed until someone removes it by hand.
+## Update
+
+```sh
+git -C ~/Code/mstack pull
+```
+
+That is all, because everything is a link into the clone. Run setup again
+only when a pull adds or removes a skill: it links the new one and removes
+the link to the one that went.
 
 ## Changing mstack
 
-Edit the files here, never the installed copies, then repeat step 3. After
-changing the docs checker, run its tests:
+Edit the files in the clone, commit and push. The installed paths are links,
+so an edit in the clone is live at once, and an agent's edit tools may refuse
+to write through the link.
+
+Two things to know about `claude/settings.json`:
+
+- Claude Code may replace the link with a regular file when it saves a
+  setting itself, for example from `/config`. This machine's copy then stops
+  following the repo. Run setup again to restore the link. The replaced file
+  goes to the backup folder, so copy across any change worth keeping.
+- The file is shared by every machine. `env.CLAUDE_CODE_SHELL` holds a path
+  that may not exist elsewhere, in which case Claude Code picks a shell
+  itself.
+
+After changing the docs checker, run its tests:
 
 ```sh
 python3 -m unittest discover -s skills/docs/scripts
@@ -79,7 +95,8 @@ python3 -m unittest discover -s skills/docs/scripts
 
 ## Requirements
 
-- An authenticated [GitHub CLI](https://cli.github.com) (`gh`).
+- An authenticated [GitHub CLI](https://cli.github.com) (`gh`), or plain
+  `git clone` if the repo is public.
 - `python3` for the docs checker.
 - `sol-loop` needs a harness that can run GPT Sol. T3 Code does this with
   `delegate_task`.

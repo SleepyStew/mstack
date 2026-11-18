@@ -1,4 +1,4 @@
-This file is `global/AGENTS.md` from my mstack repo (github.com/SleepyStew/mstack), installed by the steps in its README. To change it, edit it in that repo and install it again instead of editing this copy.
+This file lives in my mstack repo (github.com/SleepyStew/mstack) as `global/AGENTS.md`, and its setup script links it into place. To change it, edit it in that clone and commit.
 
 These are my defaults across projects. A project's own `CLAUDE.md` or `AGENTS.md` overrides them.
 
