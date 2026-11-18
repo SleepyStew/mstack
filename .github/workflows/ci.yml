@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 -m unittest discover -s skills/documentation/scripts
+      - run: python3 -m unittest discover -s claude
+      - run: python3 -m unittest test_setup
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      # Windows PowerShell 5.1 and PowerShell 7 write JSON differently.
+      - name: Windows PowerShell 5.1
+        run: ./test_setup.ps1
+        shell: powershell
+      - name: PowerShell 7
+        if: ${{ !cancelled() }}
+        run: ./test_setup.ps1
+        shell: pwsh
