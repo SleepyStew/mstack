@@ -88,4 +88,4 @@ python3 -m unittest discover -s skills/docs/scripts
 
 Some skills are adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack)
 and [tstack](https://github.com/t3dotgg/tstack). See
-[third-party notices](THIRD_PARTY.md).
+[credits](CREDITS.md).
