@@ -25,7 +25,8 @@ Goal, in a sentence or two.
 ```
 
 - **status** is where the task stands: `idea` (not agreed), `ready` (agreed,
-  not started), `doing`, or `done`.
+  not started) or `doing`. A finished task has no status, because its file is
+  deleted.
 - **type** is what it is: `feature`, `bug` or `chore`.
 - **Optional fields:** `priority: high` or `priority: low`, `depends:` with a
   list of slugs, `branch:` while the work is in progress, and anything else
@@ -46,8 +47,8 @@ Read the files you need from there.
 for an existing task on the same thing first.
 
 **Pick the next one.** Choose from `ready` tasks whose `depends` are all
-`done`. Take `priority: high` first and `priority: low` last. When that
-leaves more than one, ask the user.
+finished, meaning their files are gone. Take `priority: high` first and
+`priority: low` last. When that leaves more than one, ask the user.
 
 **Start.**
 
@@ -66,9 +67,15 @@ leaves more than one, ask the user.
 **While working.** Record a choice made on the way under Decisions, with the
 date. Keep notes short. The task is not a diary.
 
-**Finish.** In the last commit of the work, set `status: done`, remove
-`branch:` and add a one-line outcome. The task then shows as done on the main
-branch exactly when the work merges.
+**Finish.** In the last commit of the work, delete the task file and say in
+the commit body what the task was and how it ended. Move any fact worth
+keeping into the guide that owns it first. The task then leaves the main
+branch exactly when the work merges. Finished tasks are deleted, not
+archived, so that a search of the repo never turns up a stale description of
+how things used to work.
+
+To read a finished task, find the commit that removed it:
+`git log --diff-filter=D --oneline -- tasks/`.
 
 **Stop early.** Set the status back to `ready` and add a note saying why and
 where the branch stands.
@@ -76,12 +83,9 @@ where the branch stands.
 **Split.** When a task grows too large, move parts into new task files and
 list them in the original.
 
-**Tidy.** When the user asks, delete `done` tasks. Git keeps them.
-
 ## Boundaries
 
 - Commit a task change with the work it describes.
-- A task says what to build and why. How the system works goes in `docs/`,
-  and a finished task's lasting facts move to the owning guide.
+- A task says what to build and why. How the system works goes in `docs/`.
 - Product, design and pricing choices in a task are the user's. Naming and
   structure inside the code are yours.
