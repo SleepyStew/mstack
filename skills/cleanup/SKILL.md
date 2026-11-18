@@ -9,9 +9,13 @@ Leave the repo smaller, clearer and less misleading, and behaving exactly as
 it did. You survey on your own, propose a plan, and change nothing until the
 user approves it.
 
-Cleanup never changes behaviour. Anything that would, including a likely bug,
-goes in the "Looks wrong" list for the user. Larger changes that make the
-project better belong to the `improve` skill.
+Cleanup never changes behaviour, meaning anything a user, an API caller or
+another program can observe: output, responses, screens, stored data and
+public interfaces. Removing a prop nobody passes is a clean-up. Removing a
+field from an API response is not, even when nothing here reads it. Anything
+that would change behaviour, including a likely bug, goes in the "Looks
+wrong" list for the user. Larger changes that make the project better belong
+to the `improve` skill.
 
 ## 1. Set the scope and baseline
 
@@ -20,14 +24,25 @@ project better belong to the `improve` skill.
   and stop to ask if it overlaps the scope.
 - Read the project's `AGENTS.md` or `CLAUDE.md` and its docs index, so you
   know which patterns are deliberate.
-- Run the project's checks (typecheck, lint, tests, build) and record the
-  result. This is the baseline. Note anything that already fails.
+- Find what a commit or push sets off: read the CI config for deploys and
+  releases. When a push to the current branch ships to production, say so at
+  the top of the plan and recommend doing the work on a branch.
+- Run the checks CI runs that only read the code (typecheck, lint, unit
+  tests) and record the result. This is the baseline. Note anything that
+  already fails. Do not let a check install dependencies, rebuild generated
+  files or start services: call the installed binary directly when the
+  package script would. List every check you skipped and why.
 
 ## 2. Survey
 
-Read, search and run analysis tools. Do not edit yet. Use the tools the
-project already has, or one-off runs that add nothing to it (`knip`,
-`tsc --noEmit`, `cargo clippy`, `ruff`). Look for:
+Read, search and run analysis tools. Do not edit yet. Use the tools already
+installed in the project (`knip`, `tsc --noEmit`, `cargo clippy`, `ruff`). Do
+not download one. When a tool that would have helped is missing, say so in
+the plan.
+
+Put the effort where the slop is. In a large repo, read the core in full and
+search the rest, and move on from a category that turns up nothing after a
+fair look. Look for:
 
 - **Dead weight:** unused files, exports, dependencies, flags, scripts,
   config and assets. Commented-out code.
@@ -40,8 +55,11 @@ project already has, or one-off runs that add nothing to it (`knip`,
 - **Type escapes:** `any`, casts and suppressions with no reason given.
 - **Comments:** narration, section banners, change history, and comments
   that no longer match the code. Keep comments that explain why.
-- **Docs:** pages that are stale, duplicated or wrong, and broken links. Use
-  the `docs` skill's check when the project has a `docs/` folder.
+- **Docs:** pages that are stale, duplicated or wrong, and broken links. When
+  the project has a `docs/` folder, run the checker that sits beside this
+  skill, `../docs/scripts/check_docs.py` from this skill's folder. It finds
+  broken links. Wrong content only shows up by reading the docs against the
+  code.
 - **Inconsistency:** two ways of doing one thing, and names that drifted.
 - **Tests:** tests that cannot fail, and tests that repeat each other.
 
@@ -53,9 +71,12 @@ package `exports`, Worker entry points and anything another repo imports.
 
 Reply with the plan and stop.
 
-- **Clean-ups**, ranked by value for the risk. For each: what and where, why
-  it is slop, how you know removing it is safe, the risk and the rough size.
-  Group them by class, since each class becomes one commit.
+- **Clean-ups**, grouped by class, since each class becomes one commit. Rank
+  the classes by value for the risk. For each class: why it is slop, how you
+  know removing it is safe, the risk and the rough size, then its items as
+  file and line with a few words each.
+- **Coverage.** What you read in full, what you only searched, and which
+  categories turned up nothing.
 - **Looks wrong.** Things that seem off but that cleanup must not touch:
   suspected bugs, swallowed errors, security smells, docs or names that
   contradict the code, behaviour that looks unintended. Give the file and
