@@ -1,12 +1,15 @@
 # Link mstack into Claude Code and Codex on Windows. Safe to run again.
 #
-# Everything is a link into this clone, so `git pull` updates it. Run this
-# again only after a pull adds or removes a skill. Anything already in the way
-# is moved to <harness dir>\mstack-backup\<timestamp>\, never deleted.
+# The instructions and skills are links into this clone, so `git pull` updates
+# them. Claude Code's settings.json stays a regular file, and the keys in
+# claude\settings-overrides.json are merged into it. Run this again after a
+# pull adds or removes a skill or changes the overrides. Anything already in
+# the way is moved to <harness dir>\mstack-backup\<timestamp>\, never deleted,
+# and settings.json is copied there before it changes.
 #
-# Skill folders are linked as junctions, which need no special rights. The two
-# files are symbolic links, which need Developer Mode (Settings > System > For
-# developers) or an elevated shell.
+# Skill folders are linked as junctions, which need no special rights. The
+# instruction files are symbolic links, which need Developer Mode (Settings >
+# System > For developers) or an elevated shell.
 
 $ErrorActionPreference = 'Stop'
 
@@ -69,6 +72,63 @@ function Add-SkillLinks($HarnessHome) {
     }
 }
 
+# Objects merge key by key. Any other value, lists included, replaces the old one.
+function Merge-Object($Base, $Overrides) {
+    foreach ($property in $Overrides.PSObject.Properties) {
+        $current = $Base.PSObject.Properties[$property.Name]
+        if ($current -and $current.Value -is [System.Management.Automation.PSCustomObject] -and $property.Value -is [System.Management.Automation.PSCustomObject]) {
+            Merge-Object $current.Value $property.Value
+        } elseif ($current) {
+            $current.Value = $property.Value
+        } else {
+            $Base | Add-Member -NotePropertyName $property.Name -NotePropertyValue $property.Value
+        }
+    }
+}
+
+function Merge-Settings($HarnessHome) {
+    $target = Join-Path $HarnessHome 'settings.json'
+    $overrides = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repo 'claude\settings-overrides.json') | ConvertFrom-Json
+    $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
+    $isLink = $item -and $item.LinkType
+    # A link exists when its target does. Asking the link itself may say yes
+    # for a dangling one.
+    $linkTarget = if ($isLink) { @($item.Target)[0] } else { $null }
+    $existed = if ($isLink) { $linkTarget -and (Test-Path -LiteralPath $linkTarget) } else { [bool]$item }
+    # Earlier versions linked settings.json to a file in the clone that no
+    # longer exists. Writing through that link, or any dangling one, would
+    # create a file at its target.
+    $oldLink = $isLink -and (-not $existed -or (Test-LinkTo $item (Join-Path $repo 'claude\settings.json')))
+    $base = [pscustomobject]@{}
+    if ($existed) {
+        try {
+            $base = Get-Content -Raw -Encoding UTF8 -LiteralPath $target | ConvertFrom-Json
+        } catch {
+            throw "$target is not valid JSON. Fix it, then run setup again."
+        }
+        if ($base -isnot [System.Management.Automation.PSCustomObject]) {
+            throw "$target does not hold a JSON object. Fix it, then run setup again."
+        }
+    }
+    $before = $base | ConvertTo-Json -Depth 100 -Compress
+    Merge-Object $base $overrides
+    if (-not $oldLink -and ($base | ConvertTo-Json -Depth 100 -Compress) -ceq $before) {
+        Write-Host "  ok      $target"
+        return
+    }
+    if ($oldLink) {
+        $item.Delete()
+    } elseif ($existed) {
+        $backup = Join-Path $HarnessHome "mstack-backup\$stamp"
+        New-Item -ItemType Directory -Force -Path $backup | Out-Null
+        Copy-Item -LiteralPath $target -Destination $backup
+    }
+    New-Item -ItemType Directory -Force -Path $HarnessHome | Out-Null
+    $json = ($base | ConvertTo-Json -Depth 100) + "`n"
+    [IO.File]::WriteAllText($target, $json, (New-Object Text.UTF8Encoding $false))
+    if ($existed) { Write-Host "  merged  $target" } else { Write-Host "  created $target" }
+}
+
 function Test-Installed($Command, $HarnessHome) {
     (Get-Command $Command -ErrorAction SilentlyContinue) -or (Test-Path -LiteralPath $HarnessHome)
 }
@@ -79,7 +139,7 @@ $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USER
 if (Test-Installed 'claude' $claudeHome) {
     Write-Host "Claude Code ($claudeHome)"
     Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $claudeHome 'CLAUDE.md') $claudeHome
-    Add-Link (Join-Path $repo 'claude\settings.json') (Join-Path $claudeHome 'settings.json') $claudeHome
+    Merge-Settings $claudeHome
     Add-SkillLinks $claudeHome
 } else {
     Write-Host 'Claude Code: not installed, skipped. Run this again once it is.'
