@@ -1,9 +1,9 @@
 ---
-name: docs
+name: documentation
 description: Write, update, audit or reorganise a project's Markdown docs to one flat, indexed convention. Use when adding or changing a file under docs/, when the user asks to document something or to check, tidy or restructure the docs, and when setting up docs in a new project.
 ---
 
-# Docs
+# Documentation
 
 A project's docs describe how it works today, in one flat folder that an
 index maps by task. Keep them few, current and checkable.

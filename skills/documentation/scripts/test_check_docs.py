@@ -1,4 +1,4 @@
-"""Run with: python3 -m unittest discover -s skills/docs/scripts"""
+"""Run with: python3 -m unittest discover -s skills/documentation/scripts"""
 
 import tempfile
 import unittest

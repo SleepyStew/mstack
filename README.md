@@ -18,7 +18,7 @@ instead of describing it.
 | `skills/unslop` | Editing prose to remove AI writing patterns. |
 | `skills/cleanup` | Surveying a repo for slop, proposing a plan, then cleaning up with no change in behaviour. |
 | `skills/improve` | Suggesting and building improvements to a project, one approved change at a time. |
-| `skills/docs` | One flat, indexed convention for a project's `docs/` folder, with a checker script. |
+| `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script. |
 | `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
 | `skills/sol-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. |
 
@@ -90,7 +90,7 @@ Two things to know about `claude/settings.json`:
 After changing the docs checker, run its tests:
 
 ```sh
-python3 -m unittest discover -s skills/docs/scripts
+python3 -m unittest discover -s skills/documentation/scripts
 ```
 
 ## Requirements

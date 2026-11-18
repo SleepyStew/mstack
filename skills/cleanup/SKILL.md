@@ -57,9 +57,9 @@ fair look. Look for:
   that no longer match the code. Keep comments that explain why.
 - **Docs:** pages that are stale, duplicated or wrong, and broken links. When
   the project has a `docs/` folder, run the checker that sits beside this
-  skill, `../docs/scripts/check_docs.py` from this skill's folder. It finds
-  broken links. Wrong content only shows up by reading the docs against the
-  code.
+  skill, `../documentation/scripts/check_docs.py` from this skill's folder.
+  It finds broken links. Wrong content only shows up by reading the docs
+  against the code.
 - **Inconsistency:** two ways of doing one thing, and names that drifted.
 - **Tests:** tests that cannot fail, and tests that repeat each other.
 
