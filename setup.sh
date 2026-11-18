@@ -4,9 +4,10 @@
 # The instructions and skills are symlinks into this clone, so `git pull`
 # updates them. Claude Code's settings.json stays a regular file, and the keys
 # in claude/settings-overrides.json are merged into it. Run this again after a
-# pull adds or removes a skill or changes the overrides. Anything already in
-# the way is moved to <harness dir>/mstack-backup/<timestamp>/, never deleted,
-# and settings.json is copied there before it changes.
+# pull adds or removes a skill or changes the overrides. A file or folder
+# already in the way is moved to <harness dir>/mstack-backup/<timestamp>/,
+# never deleted, and settings.json is copied there before it changes. A link
+# in the way is replaced.
 
 set -euo pipefail
 
@@ -20,7 +21,10 @@ link() {
     echo "  ok      $target"
     return
   fi
-  if [ -e "$target" ] || [ -L "$target" ]; then
+  if [ -L "$target" ]; then
+    # A link pointing somewhere else. Removing a link leaves its target alone.
+    rm "$target"
+  elif [ -e "$target" ]; then
     local backup="$home/mstack-backup/$stamp/${target#"$home"/}"
     mkdir -p "$(dirname "$backup")"
     mv "$target" "$backup"

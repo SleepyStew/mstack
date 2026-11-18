@@ -65,9 +65,10 @@ alone.
 Codex gets the instructions and the skills only. `CLAUDE_CONFIG_DIR` and
 `CODEX_HOME` are respected when set.
 
-- **Nothing is deleted.** A file or folder already in the way moves to
+- **Files and folders are never deleted.** One already in the way moves to
   `mstack-backup/<timestamp>/` inside the same harness folder, and
-  `settings.json` is copied there before a merge changes it.
+  `settings.json` is copied there before a merge changes it. A link in the
+  way is replaced, and what it pointed at is left alone.
 - **Other skills are left alone.** Only skills that share a name with one
   here are replaced.
 - **Don't move the clone.** The links hold its path. If you move it, run

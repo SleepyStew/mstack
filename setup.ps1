@@ -3,9 +3,10 @@
 # The instructions and skills are links into this clone, so `git pull` updates
 # them. Claude Code's settings.json stays a regular file, and the keys in
 # claude\settings-overrides.json are merged into it. Run this again after a
-# pull adds or removes a skill or changes the overrides. Anything already in
-# the way is moved to <harness dir>\mstack-backup\<timestamp>\, never deleted,
-# and settings.json is copied there before it changes.
+# pull adds or removes a skill or changes the overrides. A file or folder
+# already in the way is moved to <harness dir>\mstack-backup\<timestamp>\,
+# never deleted, and settings.json is copied there before it changes. A link
+# in the way is replaced.
 #
 # Skill folders are linked as junctions, which need no special rights. The
 # instruction files are symbolic links, which need Developer Mode (Settings >
