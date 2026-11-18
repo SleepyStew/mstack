@@ -54,7 +54,7 @@ Comment only what the code can't say: why it's written this way, an invariant or
 
 ## Tests
 
-Where a project has a test suite, add a regression test with each bug fix and tests for new logic. Don't set up a test framework unless I ask.
+Where a project has a test suite, add tests for new logic. Add a regression test with a bug fix only when the bug could plausibly come back: a missed edge case, an ordering or state problem, or logic that a later change could easily get wrong again. Skip it for one-off slips such as a typo, a wrong constant or a missing import, where the test would only restate the fix. Don't set up a test framework unless I ask.
 
 ## Commits
 
