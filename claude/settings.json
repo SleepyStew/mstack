@@ -1,0 +1,12 @@
+{
+  "env": {
+    "CLAUDE_CODE_SHELL": "/usr/bin/bash"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "advisorModel": "fable",
+  "tui": "fullscreen"
+}
