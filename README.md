@@ -25,7 +25,7 @@ Claude Code settings.
 | `skills/improve` | Suggesting and building improvements to a project, one approved change at a time. |
 | `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`. |
 | `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
-| `skills/sol-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
+| `skills/review-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
 
 `global/AGENTS.md` holds only what applies to almost every session. Anything
 narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.

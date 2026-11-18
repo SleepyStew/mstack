@@ -5,7 +5,7 @@ Parts of mstack are adapted from two MIT-licensed projects.
 | mstack file | Source | Copyright |
 | --- | --- | --- |
 | `skills/unslop/SKILL.md` | The `unslop` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack) | (c) 2026 Lauren Tan |
-| `skills/sol-loop/SKILL.md` | The `sol-loop` skill in [tstack](https://github.com/t3dotgg/tstack) | (c) 2026 Theo Browne |
+| `skills/review-loop/SKILL.md` | The `sol-loop` skill in [tstack](https://github.com/t3dotgg/tstack) | (c) 2026 Theo Browne |
 
 The `cleanup`, `evidence` and `documentation` skills take ideas from pstack's
 `correct`, `prove-it-works` and `technical-writing` skills and from tstack's
