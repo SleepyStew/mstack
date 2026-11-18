@@ -10,7 +10,9 @@ from merge_settings import apply, merge
 
 class MergeSettings(unittest.TestCase):
     def setUp(self):
-        self.root = Path(tempfile.mkdtemp())
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name)
         self.overrides = self.root / "overrides.json"
         self.settings = self.root / "home" / "settings.json"
         self.backup = self.root / "backup"
