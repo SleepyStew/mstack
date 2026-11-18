@@ -89,7 +89,12 @@ function Merge-Object($Base, $Overrides) {
 
 function Merge-Settings($HarnessHome) {
     $target = Join-Path $HarnessHome 'settings.json'
-    $overrides = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repo 'claude\settings-overrides.json') | ConvertFrom-Json
+    # PowerShell 6 and later read a string that looks like a timestamp as a
+    # date and write it back in another form. Only 7.5 and later can be told
+    # to keep it a string.
+    $dates = @{}
+    if ((Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')) { $dates.DateKind = 'String' }
+    $overrides = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repo 'claude\settings-overrides.json') | ConvertFrom-Json @dates
     $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
     $isLink = $item -and $item.LinkType
     # A link exists when its target does. Asking the link itself may say yes
@@ -101,7 +106,7 @@ function Merge-Settings($HarnessHome) {
     $base = [pscustomobject]@{}
     if ($existed) {
         try {
-            $base = Get-Content -Raw -Encoding UTF8 -LiteralPath $target | ConvertFrom-Json
+            $base = Get-Content -Raw -Encoding UTF8 -LiteralPath $target | ConvertFrom-Json @dates
         } catch {
             throw "$target is not valid JSON. Fix it, then run setup again."
         }

@@ -76,14 +76,17 @@ try {
     Assert ($merged.theme -ceq 'light') 'a setting the overrides do not name is kept'
     Assert ($merged.env.KEEP -ceq '1') 'an object merges key by key'
     Assert ($merged.note -ceq $note) 'quotes, angle brackets and accents survive'
-    Assert ($text.Contains($when)) 'a string that looks like a date is written back unchanged'
+    # PowerShell 6 to 7.4 cannot keep one, which the readme says.
+    if ($PSVersionTable.PSVersion.Major -lt 6 -or (Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')) {
+        Assert ($text.Contains($when)) 'a string that looks like a date is written back unchanged'
+    }
     Assert ($text -match '"list":\s*\[\s*1\s*\]') 'a one-item list stays a list'
 
     $changed = @(Invoke-Setup | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
     Assert ($changed.Count -eq 0) "a second run changes nothing, but it printed: $changed"
     Assert ((Read-Text $settings) -ceq $text) 'a second run leaves settings.json as it was'
 
-    Write-Host 'setup.ps1 tests passed'
+    Write-Host "setup.ps1 tests passed on PowerShell $($PSVersionTable.PSVersion)"
 } finally {
     $env:CLAUDE_CONFIG_DIR, $env:CODEX_HOME = $saved
     # Links go first. Removing a folder tree in Windows PowerShell can follow

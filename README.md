@@ -45,7 +45,9 @@ git clone https://github.com/SleepyStew/mstack ~/Code/mstack
 
 `setup.sh` needs `python3`. On Windows, run `setup.ps1` in PowerShell
 instead, which does not. File links there need Developer Mode or an
-elevated shell.
+elevated shell. Use Windows PowerShell or PowerShell 7.5 or later:
+PowerShell 6 to 7.4 rewrites a `settings.json` string that looks like a
+timestamp in another form.
 
 The script links these into place, for each harness that is installed:
 
