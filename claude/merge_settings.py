@@ -6,6 +6,9 @@ Usage: merge_settings.py <overrides.json> <settings.json> <backup-dir>
 Objects merge key by key. Any other value in the overrides, lists included,
 replaces the one in settings.json. Keys the overrides do not name are kept.
 The previous file is copied to <backup-dir> before a changed one is written.
+
+env.CLAUDE_CODE_SHELL names a shell, since its path differs by machine. It
+is written as the path found here, and left out when the shell is missing.
 """
 
 import json
@@ -27,6 +30,11 @@ def merge(base, overrides):
 def apply(overrides_path, settings_path, backup_dir):
     """Return "ok", "created" or "merged"."""
     overrides = json.loads(overrides_path.read_text(encoding="utf-8"))
+    env = overrides.get("env", {})
+    if "CLAUDE_CODE_SHELL" in env:
+        shell = shutil.which(env.pop("CLAUDE_CODE_SHELL"))
+        if shell:
+            env["CLAUDE_CODE_SHELL"] = shell
     # Writing through a dangling link would create a file at its target.
     dangling = settings_path.is_symlink() and not settings_path.exists()
     existed = settings_path.exists()

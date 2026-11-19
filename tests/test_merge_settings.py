@@ -1,6 +1,7 @@
 """Run with: python3 -m unittest discover -s tests"""
 
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -45,6 +46,18 @@ class MergeSettings(unittest.TestCase):
         self.assertEqual(self.run_apply(), "merged")
         self.assertEqual(self.read(), {"theme": "light", "env": {"B": "2", "A": "1"}, "rules": ["x"]})
         self.assertEqual(json.loads((self.backup / "settings.json").read_text()), {"theme": "light", "env": {"B": "2"}})
+
+    def test_shell_name_becomes_its_path_on_this_machine(self):
+        self.overrides.write_text(json.dumps({"env": {"CLAUDE_CODE_SHELL": "python3"}}))
+        self.run_apply()
+        self.assertEqual(self.read(), {"env": {"CLAUDE_CODE_SHELL": shutil.which("python3")}})
+
+    def test_missing_shell_is_left_out(self):
+        self.settings.parent.mkdir()
+        self.settings.write_text('{"env": {"CLAUDE_CODE_SHELL": "/mine"}}')
+        self.overrides.write_text(json.dumps({"env": {"CLAUDE_CODE_SHELL": "no-such-shell"}}))
+        self.assertEqual(self.run_apply(), "ok")
+        self.assertEqual(self.read(), {"env": {"CLAUDE_CODE_SHELL": "/mine"}})
 
     def test_second_run_changes_nothing(self):
         self.run_apply()

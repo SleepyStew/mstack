@@ -75,6 +75,7 @@ try {
     }
     Assert ($merged.theme -ceq 'light') 'a setting the overrides do not name is kept'
     Assert ($merged.env.KEEP -ceq '1') 'an object merges key by key'
+    Assert (-not $merged.env.PSObject.Properties['CLAUDE_CODE_SHELL']) 'the shell override is left to Claude Code'
     Assert ($merged.note -ceq $note) 'quotes, angle brackets and accents survive'
     # PowerShell 6 to 7.4 cannot keep one, which the readme says.
     if ($PSVersionTable.PSVersion.Major -lt 6 -or (Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')) {

@@ -47,7 +47,7 @@ are about me, so fork the repo and change them before you run setup:
 | Package managers    | pnpm for JavaScript and uv for Python.                                                                                                                                                                                         |
 | Deployment          | Cloudflare Wrangler, and only when I ask. Replace it with how you deploy and what counts as production.                                                                                                                        |
 
-`claude/settings-overrides.json` is mine in the same way: the path to bash,
+`claude/settings-overrides.json` is mine in the same way: bash as the shell,
 the fullscreen interface, the advisor model and no attribution on commits or
 pull requests. Setup merges it into your Claude Code settings, so edit it or
 empty it first.
@@ -121,8 +121,10 @@ it reaches a machine only when setup runs there. Setup puts its values back
 on every run, so a setting changed on one machine, for example from
 `/config`, lasts only if the overrides do not name it. Removing a key from
 the overrides does not remove it from a machine that already has it.
-`env.CLAUDE_CODE_SHELL` holds a path that may not exist on every machine,
-in which case Claude Code picks a shell itself.
+`env.CLAUDE_CODE_SHELL` names a shell, not a path, because the path differs
+by machine. `setup.sh` writes the path it finds there, and leaves the
+setting alone when the shell is missing. `setup.ps1` always leaves it alone,
+since Claude Code on Windows finds Git Bash itself.
 
 After changing the docs checker, the settings merge or a setup script, run
 its tests:

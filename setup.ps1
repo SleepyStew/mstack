@@ -95,6 +95,9 @@ function Merge-Settings($HarnessHome) {
     $dates = @{}
     if ((Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')) { $dates.DateKind = 'String' }
     $overrides = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repo 'claude\settings-overrides.json') | ConvertFrom-Json @dates
+    # The overrides name a shell for setup.sh to find. Claude Code on Windows
+    # finds Git Bash itself.
+    if ($overrides.env) { $overrides.env.PSObject.Properties.Remove('CLAUDE_CODE_SHELL') }
     $item = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
     $isLink = $item -and $item.LinkType
     # A link exists when its target does. Asking the link itself may say yes

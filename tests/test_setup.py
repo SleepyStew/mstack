@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -34,6 +35,7 @@ class Setup(unittest.TestCase):
             links = {path.name: os.readlink(path) for path in (home / "skills").iterdir()}
             self.assertEqual(links, {name: str(REPO / "skills" / name) for name in SKILLS})
         overrides = json.loads((REPO / "claude/settings-overrides.json").read_text(encoding="utf-8"))
+        overrides["env"]["CLAUDE_CODE_SHELL"] = shutil.which("bash")
         self.assertEqual(json.loads((self.claude / "settings.json").read_text(encoding="utf-8")), overrides)
         self.assertFalse((self.codex / "settings.json").exists())
 
