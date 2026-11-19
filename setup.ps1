@@ -3,7 +3,7 @@
 # The instructions and skills are links into this clone, so `git pull` updates
 # them. Run this again after a pull adds or removes a skill. A file or folder
 # already in the way is moved to <harness dir>\mstack-backup\<timestamp>\,
-# never deleted. A link in the way is replaced.
+# never deleted. A link in the way is replaced. remove.ps1 takes the links out.
 #
 # With -ApplySettings, the keys in claude\settings-overrides.json are also
 # merged into Claude Code's settings.json, which stays a regular file and is

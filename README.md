@@ -121,6 +121,23 @@ skill and removes the link to the one that went. If you apply the settings,
 run it with `--apply-settings` when a pull changes
 `claude/settings-overrides.json`.
 
+## Remove
+
+```sh
+~/Code/mstack/remove.sh
+```
+
+On Windows that is `remove.ps1`. It takes out the links that point into the
+clone and nothing else, so your own skills stay. Two things are left for
+you, because the script can't know what you want back:
+
+- Files that setup moved aside are still in `mstack-backup/` inside each
+  harness folder. Move back the ones you want.
+- `settings.json` keeps any overrides you applied. Its earlier versions are
+  in the same backup folder.
+
+Then delete the clone.
+
 ## Changing mstack
 
 Edit the files in the clone, commit and push. An edit to the instructions
@@ -144,9 +161,9 @@ its tests:
 python3 -m unittest discover -s tests
 ```
 
-`tests/test_setup.ps1` does the same for `setup.ps1` on Windows. CI runs
-all of them on every push to `main`, the Windows one under both Windows
-PowerShell and PowerShell 7.
+`tests/test_setup.ps1` does the same for `setup.ps1` and `remove.ps1` on
+Windows. CI runs all of them on every push to `main`, the Windows one under
+both Windows PowerShell and PowerShell 7.
 
 ## Credits
 

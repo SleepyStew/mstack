@@ -1,4 +1,5 @@
-# Run setup.ps1 against scratch harness folders and check what it leaves.
+# Run setup.ps1 and remove.ps1 against scratch harness folders and check what
+# they leave.
 # Needs Developer Mode or an elevated shell, as setup.ps1 does.
 #
 # Run with: powershell -File tests/test_setup.ps1
@@ -86,6 +87,15 @@ try {
     $changed = @(Invoke-Setup -ApplySettings | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
     Assert ($changed.Count -eq 0) "a second run changes nothing, but it printed: $changed"
     Assert ((Read-Text $settings) -ceq $text) 'a second run leaves settings.json as it was'
+
+    & (Join-Path $repo 'remove.ps1') 6>&1 | Out-Null
+    Assert (-not (Test-Path -LiteralPath (Join-Path $claude 'CLAUDE.md'))) 'remove takes out the CLAUDE.md link'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $codex 'AGENTS.md'))) 'remove takes out the Codex AGENTS.md link'
+    Assert (@(Get-ChildItem -LiteralPath (Join-Path $codex 'skills') -Force).Count -eq 0) 'remove takes out the Codex skill links'
+    $names = @((Get-ChildItem -LiteralPath $skills -Force).Name)
+    Assert ($names.Count -eq 1 -and $names[0] -ceq 'theirs') "remove leaves only the skill that is not from mstack, but found: $names"
+    Assert (Test-Path -LiteralPath (Join-Path $repo 'skills\why\SKILL.md')) 'remove leaves the skills in the clone'
+    Assert ((Read-Text $settings) -ceq $text) 'remove leaves settings.json as it was'
 
     [IO.File]::WriteAllText($settings, $seed, $utf8)
     Invoke-Setup | Out-Null

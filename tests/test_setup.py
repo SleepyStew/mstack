@@ -22,10 +22,13 @@ class Setup(unittest.TestCase):
         self.claude.mkdir()
         self.codex.mkdir()
 
-    def run_setup(self, *args):
+    def run_script(self, name, *args):
         env = {**os.environ, "CLAUDE_CONFIG_DIR": str(self.claude), "CODEX_HOME": str(self.codex)}
-        result = subprocess.run([str(REPO / "setup.sh"), *args], env=env, check=True, capture_output=True, text=True)
+        result = subprocess.run([str(REPO / name), *args], env=env, check=True, capture_output=True, text=True)
         return result.stdout
+
+    def run_setup(self, *args):
+        return self.run_script("setup.sh", *args)
 
     def test_links_instructions_and_skills(self):
         self.run_setup()
@@ -47,6 +50,56 @@ class Setup(unittest.TestCase):
             json.loads((self.claude / "settings.json").read_text(encoding="utf-8")), {"theme": "light", **overrides}
         )
         self.assertFalse((self.codex / "settings.json").exists())
+
+    def test_remove_takes_out_only_the_links_into_this_clone(self):
+        skills = self.claude / "skills"
+        elsewhere = self.root / "elsewhere"
+        for folder in (skills, elsewhere, skills / "theirs"):
+            folder.mkdir()
+        (skills / "their-link").symlink_to(elsewhere)
+        (self.codex / "AGENTS.md").write_text("mine")
+        self.run_setup("--apply-settings")
+        settings = (self.claude / "settings.json").read_text()
+        self.run_script("remove.sh")
+        self.assertEqual(sorted(path.name for path in skills.iterdir()), ["their-link", "theirs"])
+        self.assertFalse((self.claude / "CLAUDE.md").is_symlink())
+        self.assertEqual(list((self.codex / "skills").iterdir()), [])
+        self.assertEqual((self.claude / "settings.json").read_text(), settings)
+        (backup,) = (self.codex / "mstack-backup").iterdir()
+        self.assertEqual((backup / "AGENTS.md").read_text(), "mine")
+        self.assertNotIn("removed", self.run_script("remove.sh"))
+
+    def test_second_run_changes_nothing(self):
+        self.run_setup()
+        actions = [line.split()[0] for line in self.run_setup().splitlines() if line.startswith("  ")]
+        self.assertEqual(set(actions), {"ok"})
+        self.assertFalse((self.claude / "mstack-backup").exists())
+
+    def test_file_or_folder_in_the_way_moves_to_the_backup(self):
+        (self.claude / "CLAUDE.md").write_text("mine")
+        (self.claude / "skills/why").mkdir(parents=True)
+        (self.claude / "skills/why/SKILL.md").write_text("mine")
+        self.run_setup()
+        (backup,) = (self.claude / "mstack-backup").iterdir()
+        self.assertEqual((backup / "CLAUDE.md").read_text(), "mine")
+        self.assertEqual((backup / "skills/why/SKILL.md").read_text(), "mine")
+        self.assertEqual(os.readlink(self.claude / "skills/why"), str(REPO / "skills/why"))
+
+    def test_stale_links_go_and_other_skills_stay(self):
+        skills = self.claude / "skills"
+        elsewhere = self.root / "elsewhere"
+        for folder in (skills, elsewhere, skills / "theirs"):
+            folder.mkdir()
+        (skills / "why").symlink_to(elsewhere)
+        (skills / "gone").symlink_to(REPO / "skills/gone")
+        (skills / "their-dangling").symlink_to(self.root / "nowhere")
+        self.run_setup()
+        self.assertEqual(os.readlink(skills / "why"), str(REPO / "skills/why"))
+        self.assertTrue(elsewhere.is_dir())
+        self.assertFalse((skills / "gone").is_symlink())
+        self.assertTrue((skills / "theirs").is_dir())
+        self.assertTrue((skills / "their-dangling").is_symlink())
+        self.assertFalse((self.claude / "mstack-backup").exists())
 
 
 if __name__ == "__main__":
