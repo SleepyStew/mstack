@@ -19,6 +19,39 @@ and show their work instead of describing it.
 | `documentation` | Docs need to stay few, current and checkable. This sets one flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`.                                               |
 | `tasks`         | Planned work lives as plain Markdown files in a `tasks/` folder, so there is no tool to install. A finished task's file is deleted, because old ones hold stale descriptions of the code.                        |
 
+## The instructions
+
+`global/AGENTS.md` is loaded into every session, so it holds only what
+applies to almost every one. Anything narrower is a skill, or belongs in a
+project's own `AGENTS.md` or docs. It tells an agent how to:
+
+- keep me informed without padding, and ask me a question when a choice is
+  a matter of preference instead of picking a default
+- hand work back with proof: a screenshot, a recording or real command
+  output
+- write the least code that solves the problem, comment only what the code
+  can't say, and add tests where they would catch something
+- commit as it goes in small Conventional Commits, and never push, merge or
+  deploy unasked
+
+Most of that is about how to work and should suit anyone. The parts below
+are about me, so fork the repo and change them before you run setup:
+
+| Section | What to change |
+| --- | --- |
+| The opening lines | They name this repo as the file's home. Point them at your fork. |
+| Asking me questions | It prefers Claude Code's question tool to questions in the reply. Drop it if you would rather answer in text. |
+| Writing | British and Australian spelling, plain hyphens and day-first dates. Set your own spelling, punctuation and date format. |
+| Environment | My terminal runs zsh and secrets come through T3 Code. Name your own shell and the way you hand over secrets. |
+| Commits | Agents commit without asking, on the default branch too, with no co-author lines. Change this if you want to approve commits or keep the attribution. |
+| Package managers | pnpm for JavaScript and uv for Python. |
+| Deployment | Cloudflare Wrangler, and only when I ask. Replace it with how you deploy and what counts as production. |
+
+`claude/settings-overrides.json` is mine in the same way: the path to bash,
+the fullscreen interface, the advisor model and no attribution on commits or
+pull requests. Setup merges it into your Claude Code settings, so edit it or
+empty it first.
+
 ## Set up
 
 Clone the repo anywhere and run the setup script. It's safe to run multiple times.
