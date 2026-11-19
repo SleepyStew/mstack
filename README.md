@@ -1,42 +1,27 @@
 # mstack
 
-How I want coding agents to work with me: one file of global instructions,
-a small set of skills and my Claude Code settings. It works in Claude Code
-and Codex, and uses [T3 Code](https://github.com/pingdotgg/t3code) features
-where they exist.
+How I want coding agents to work with me, kept small on purpose.
+The aim is less code of higher quality, and agents that are independent
+and show their work instead of describing it.
 
-The aim is less code of higher quality, and agents that show their work
-instead of describing it.
+## The skills
 
-It is set up for my own machines and accounts. To use it, fork it and edit
-`global/AGENTS.md` and `claude/settings-overrides.json` first: setup links
-the first in as your global instructions and merges the second into your
-Claude Code settings.
-
-## What's here
-
-| Path | What it is |
-| --- | --- |
-| `global/AGENTS.md` | Instructions loaded into every session: how to talk to me, write, code, comment, test, commit and hand work back. |
-| `claude/settings-overrides.json` | The Claude Code user settings I want on every machine, merged into `settings.json` by setup. |
-| `skills/evidence` | Capturing screenshots, recordings or command output as proof at handoff. |
-| `skills/unslop` | Editing prose to remove AI writing patterns. |
-| `skills/cleanup` | Surveying a repo for slop, proposing a plan, then cleaning up with no change in behaviour. |
-| `skills/improve` | Suggesting and building improvements to a project, one approved change at a time. |
-| `skills/documentation` | One flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`. |
-| `skills/tasks` | Planned work as plain Markdown files in a `tasks/` folder. |
-| `skills/review-loop` | Reviewing a change with GPT Sol in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`. |
-| `skills/plan-with-me` | Interviewing me in rounds of questions until we agree on what to build, ending in a summary I confirm. |
-| `skills/debugging` | Finding a bug's root cause by building a check that fails on it first, then fixing it where it starts. |
-| `skills/why` | Explaining why code or a decision is the way it is, from the commits, pull requests and issues behind it. |
-
-`global/AGENTS.md` holds only what applies to almost every session. Anything
-narrower is a skill, or belongs in a project's own `AGENTS.md` or docs.
+| Skill             | Why it is here                                                                                                                                                                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `plan-with-me`  | A vague request gets built the way the agent guessed it. Here the agent looks up the facts itself, interviews me in rounds of questions about the decisions, and builds nothing until I confirm a written summary. |
+| `debugging`     | Reading code produces theories, not fixes. The agent first builds a check that fails on the bug, finds the root cause, then fixes it where it starts.                                                              |
+| `why`           | Code shows what it does and rarely why. The answer comes from the commits, pull requests and issues behind it, with the agent's own inferences marked.                                                             |
+| `evidence`      | I review what an agent shows, not what it says. At handoff it captures screenshots, a recording or real command output as proof.                                                                                   |
+| `review-loop`   | A change is more likely to be correct once a second model has reviewed it. GPT Sol reviews in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`.     |
+| `cleanup`       | Repos collect dead code, slop and misleading comments. The agent surveys the repo, proposes a plan, then cleans up the approved parts with no change in behaviour.                                                 |
+| `improve`       | Improvements change behaviour, so I choose them. The agent suggests, I pick, and it builds one approved change at a time.                                                                                          |
+| `unslop`        | Prose from an agent reads as generated. This edits out the AI writing patterns without changing the meaning or the voice.                                                                                          |
+| `documentation` | Docs need to stay few, current and checkable. This sets one flat, indexed convention for a project's `docs/` folder, with a checker script that needs `python3`.                                               |
+| `tasks`         | Planned work lives as plain Markdown files in a `tasks/` folder, so there is no tool to install. A finished task's file is deleted, because old ones hold stale descriptions of the code.                        |
 
 ## Set up
 
-Clone the repo anywhere and run the setup script. A person or an agent can
-do this, and it is safe to run again.
+Clone the repo anywhere and run the setup script. It's safe to run multiple times.
 
 ```sh
 git clone https://github.com/SleepyStew/mstack ~/Code/mstack
@@ -51,16 +36,18 @@ timestamp in another form.
 
 The script links these into place, for each harness that is installed:
 
-| Link | Points at |
-| --- | --- |
-| `~/.claude/CLAUDE.md` | `global/AGENTS.md` |
+| Link                        | Points at                             |
+| --------------------------- | ------------------------------------- |
+| `~/.claude/CLAUDE.md`     | `global/AGENTS.md`                  |
 | `~/.claude/skills/<name>` | `skills/<name>`, one link per skill |
-| `~/.codex/AGENTS.md` | `global/AGENTS.md` |
-| `~/.codex/skills/<name>` | `skills/<name>`, one link per skill |
+| `~/.codex/AGENTS.md`      | `global/AGENTS.md`                  |
+| `~/.codex/skills/<name>`  | `skills/<name>`, one link per skill |
 
 It also merges `claude/settings-overrides.json` into
 `~/.claude/settings.json`, which stays a regular file that Claude Code and
-you can edit. Objects merge key by key, and any other value, lists included,
+you can edit. It is merged and not linked because Claude Code rewrites
+`settings.json` when it saves a setting, which would replace a link with a
+regular file. Objects merge key by key, and any other value, lists included,
 replaces the one already there. Settings the overrides do not name are left
 alone.
 
@@ -117,10 +104,10 @@ PowerShell and PowerShell 7.
 
 ## Credits
 
-Some skills are adapted from these MIT-licensed projects:
+Some skills are adapted from these projects:
 
-- `unslop` from the `unslop` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
-- `why` from the `why` skill in [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
+- `unslop` from [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
+- `why` from [pstack](https://github.com/cursor/plugins/tree/main/pstack), (c) 2026 Lauren Tan
 - `review-loop` from the `sol-loop` skill in [tstack](https://github.com/t3dotgg/tstack), (c) 2026 Theo Browne
 - `plan-with-me` from the `grilling` skill in [mattpocock/skills](https://github.com/mattpocock/skills),
   (c) 2026 Matt Pocock, and the `interview-me` skill in
@@ -129,7 +116,7 @@ Some skills are adapted from these MIT-licensed projects:
 
 `cleanup`, `evidence` and `documentation` take ideas from pstack's `correct`,
 `prove-it-works` and `technical-writing` skills and from tstack's
-`full-send`, without copying their text.
+`full-send`.
 
 The adapted parts are under the MIT licence in [LICENSE](LICENSE), with the
 copyright lines above.
