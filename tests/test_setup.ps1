@@ -23,7 +23,7 @@ function Read-Text($Path) {
 }
 
 function Invoke-Setup {
-    & (Join-Path $repo 'setup.ps1') 6>&1 | ForEach-Object { "$_" }
+    & (Join-Path $repo 'setup.ps1') @args 6>&1 | ForEach-Object { "$_" }
 }
 
 $saved = $env:CLAUDE_CONFIG_DIR, $env:CODEX_HOME
@@ -43,7 +43,7 @@ try {
     $seed = '{"theme": "light", "note": "' + $note + '", "when": "' + $when + '", "env": {"KEEP": "1"}, "list": [1]}'
     [IO.File]::WriteAllText($settings, $seed, $utf8)
 
-    Invoke-Setup | Out-Null
+    Invoke-Setup -ApplySettings | Out-Null
 
     $instructions = Get-Item -LiteralPath (Join-Path $claude 'CLAUDE.md') -Force
     Assert ($instructions.LinkType -eq 'SymbolicLink') 'CLAUDE.md is a symbolic link'
@@ -83,9 +83,13 @@ try {
     }
     Assert ($text -match '"list":\s*\[\s*1\s*\]') 'a one-item list stays a list'
 
-    $changed = @(Invoke-Setup | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
+    $changed = @(Invoke-Setup -ApplySettings | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
     Assert ($changed.Count -eq 0) "a second run changes nothing, but it printed: $changed"
     Assert ((Read-Text $settings) -ceq $text) 'a second run leaves settings.json as it was'
+
+    [IO.File]::WriteAllText($settings, $seed, $utf8)
+    Invoke-Setup | Out-Null
+    Assert ((Read-Text $settings) -ceq $seed) 'setup without -ApplySettings leaves settings.json as it was'
 
     Write-Host "setup.ps1 tests passed on PowerShell $($PSVersionTable.PSVersion)"
 } finally {

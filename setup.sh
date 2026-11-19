@@ -2,14 +2,24 @@
 # Link mstack into Claude Code and Codex. Safe to run again.
 #
 # The instructions and skills are symlinks into this clone, so `git pull`
-# updates them. Claude Code's settings.json stays a regular file, and the keys
-# in claude/settings-overrides.json are merged into it. Run this again after a
-# pull adds or removes a skill or changes the overrides. A file or folder
-# already in the way is moved to <harness dir>/mstack-backup/<timestamp>/,
-# never deleted, and settings.json is copied there before it changes. A link
-# in the way is replaced.
+# updates them. Run this again after a pull adds or removes a skill. A file or
+# folder already in the way is moved to <harness dir>/mstack-backup/<timestamp>/,
+# never deleted. A link in the way is replaced.
+#
+# With --apply-settings, the keys in claude/settings-overrides.json are also
+# merged into Claude Code's settings.json, which stays a regular file and is
+# copied to the backup folder before it changes. Settings are personal, so
+# they are left alone unless asked for.
 
 set -euo pipefail
+
+apply_settings=false
+for arg in "$@"; do
+  case "$arg" in
+    --apply-settings) apply_settings=true ;;
+    *) echo "Usage: setup.sh [--apply-settings]" >&2; exit 2 ;;
+  esac
+done
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 stamp="$(date +%Y%m%d-%H%M%S)"
@@ -69,10 +79,13 @@ codex_home="${CODEX_HOME:-$HOME/.codex}"
 
 if installed claude "$claude_home"; then
   # Checked before the first change, so a machine without it is not left half set up.
-  command -v python3 >/dev/null 2>&1 || { echo "python3 is needed to merge the settings overrides." >&2; exit 1; }
+  if $apply_settings && ! command -v python3 >/dev/null 2>&1; then
+    echo "python3 is needed to merge the settings overrides." >&2
+    exit 1
+  fi
   echo "Claude Code ($claude_home)"
   link "$repo/global/AGENTS.md" "$claude_home/CLAUDE.md" "$claude_home"
-  merge_settings "$claude_home"
+  if $apply_settings; then merge_settings "$claude_home"; fi
   link_skills "$claude_home"
 else
   echo "Claude Code: not installed, skipped. Run this again once it is."
@@ -86,4 +99,7 @@ else
   echo "Codex: not installed, skipped. Run this again once it is."
 fi
 
+if ! $apply_settings; then
+  echo "Claude Code's settings.json was not touched. To merge claude/settings-overrides.json into it, run this with --apply-settings."
+fi
 echo "Done. New sessions pick this up. Sessions already running keep what they loaded."

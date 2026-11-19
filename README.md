@@ -49,8 +49,8 @@ are about me, so fork the repo and change them before you run setup:
 
 `claude/settings-overrides.json` is mine in the same way: bash as the shell,
 the fullscreen interface, the advisor model and no attribution on commits or
-pull requests. Setup merges it into your Claude Code settings, so edit it or
-empty it first.
+pull requests. Setup leaves your Claude Code settings alone unless you run
+it with `--apply-settings`, so edit the file before you do.
 
 ## Set up
 
@@ -61,11 +61,8 @@ git clone https://github.com/SleepyStew/mstack ~/Code/mstack
 ~/Code/mstack/setup.sh
 ```
 
-`setup.sh` needs `python3`. On Windows, run `setup.ps1` in PowerShell
-instead, which does not. File links there need Developer Mode or an
-elevated shell. Use Windows PowerShell or PowerShell 7.5 or later:
-PowerShell 6 to 7.4 rewrites a `settings.json` string that looks like a
-timestamp in another form.
+On Windows, run `setup.ps1` in PowerShell instead. File links there need
+Developer Mode or an elevated shell.
 
 The script links these into place, for each harness that is installed:
 
@@ -76,20 +73,10 @@ The script links these into place, for each harness that is installed:
 | `~/.codex/AGENTS.md`      | `global/AGENTS.md`                  |
 | `~/.codex/skills/<name>`  | `skills/<name>`, one link per skill |
 
-It also merges `claude/settings-overrides.json` into
-`~/.claude/settings.json`, which stays a regular file that Claude Code and
-you can edit. It is merged and not linked because Claude Code rewrites
-`settings.json` when it saves a setting, which would replace a link with a
-regular file. Objects merge key by key, and any other value, lists included,
-replaces the one already there. Settings the overrides do not name are left
-alone.
-
-Codex gets the instructions and the skills only. `CLAUDE_CONFIG_DIR` and
-`CODEX_HOME` are respected when set.
+`CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected when set.
 
 - **Files and folders are never deleted.** One already in the way moves to
-  `mstack-backup/<timestamp>/` inside the same harness folder, and
-  `settings.json` is copied there before a merge changes it. A link in the
+  `mstack-backup/<timestamp>/` inside the same harness folder. A link in the
   way is replaced, and what it pointed at is left alone.
 - **Other skills are left alone.** Only skills that share a name with one
   here are replaced.
@@ -99,6 +86,29 @@ Codex gets the instructions and the skills only. `CLAUDE_CONFIG_DIR` and
 New sessions pick the files up. Sessions already running keep what they
 loaded.
 
+### Settings
+
+Setup leaves Claude Code's settings alone, because they are more personal
+than the instructions and skills. To also merge
+`claude/settings-overrides.json` into `~/.claude/settings.json`, ask for it:
+
+```sh
+~/Code/mstack/setup.sh --apply-settings
+```
+
+On Windows that is `setup.ps1 -ApplySettings`. Codex gets no settings.
+
+`settings.json` stays a regular file that Claude Code and you can edit, and
+it is copied to the backup folder before a merge changes it. It is merged
+and not linked because Claude Code rewrites `settings.json` when it saves a
+setting, which would replace a link with a regular file. Objects merge key
+by key, and any other value, lists included, replaces the one already there.
+Settings the overrides do not name are left alone.
+
+The merge needs `python3` in `setup.sh`. In PowerShell, use Windows
+PowerShell or PowerShell 7.5 or later: PowerShell 6 to 7.4 rewrites a
+`settings.json` string that looks like a timestamp in another form.
+
 ## Update
 
 ```sh
@@ -106,9 +116,10 @@ git -C ~/Code/mstack pull
 ```
 
 A pull updates the instructions and skills, since they are links into the
-clone. Run setup again when a pull adds or removes a skill or changes
-`claude/settings-overrides.json`: it links the new skill, removes the link
-to the one that went and merges the overrides again.
+clone. Run setup again when a pull adds or removes a skill: it links the new
+skill and removes the link to the one that went. If you apply the settings,
+run it with `--apply-settings` when a pull changes
+`claude/settings-overrides.json`.
 
 ## Changing mstack
 
@@ -117,8 +128,8 @@ or a skill is live at once, though an agent's edit tools may refuse to
 write through the link.
 
 `claude/settings-overrides.json` is shared by every machine, and an edit to
-it reaches a machine only when setup runs there. Setup puts its values back
-on every run, so a setting changed on one machine, for example from
+it reaches a machine only when setup runs there with `--apply-settings`.
+That puts its values back on every run, so a setting changed on one machine, for example from
 `/config`, lasts only if the overrides do not name it. Removing a key from
 the overrides does not remove it from a machine that already has it.
 `env.CLAUDE_CODE_SHELL` names a shell, not a path, because the path differs

@@ -1,16 +1,20 @@
 # Link mstack into Claude Code and Codex on Windows. Safe to run again.
 #
 # The instructions and skills are links into this clone, so `git pull` updates
-# them. Claude Code's settings.json stays a regular file, and the keys in
-# claude\settings-overrides.json are merged into it. Run this again after a
-# pull adds or removes a skill or changes the overrides. A file or folder
+# them. Run this again after a pull adds or removes a skill. A file or folder
 # already in the way is moved to <harness dir>\mstack-backup\<timestamp>\,
-# never deleted, and settings.json is copied there before it changes. A link
-# in the way is replaced.
+# never deleted. A link in the way is replaced.
+#
+# With -ApplySettings, the keys in claude\settings-overrides.json are also
+# merged into Claude Code's settings.json, which stays a regular file and is
+# copied to the backup folder before it changes. Settings are personal, so
+# they are left alone unless asked for.
 #
 # Skill folders are linked as junctions, which need no special rights. The
 # instruction files are symbolic links, which need Developer Mode (Settings >
 # System > For developers) or an elevated shell.
+
+param([switch]$ApplySettings)
 
 $ErrorActionPreference = 'Stop'
 
@@ -146,7 +150,7 @@ $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USER
 if (Test-Installed 'claude' $claudeHome) {
     Write-Host "Claude Code ($claudeHome)"
     Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $claudeHome 'CLAUDE.md') $claudeHome
-    Merge-Settings $claudeHome
+    if ($ApplySettings) { Merge-Settings $claudeHome }
     Add-SkillLinks $claudeHome
 } else {
     Write-Host 'Claude Code: not installed, skipped. Run this again once it is.'
@@ -160,4 +164,7 @@ if (Test-Installed 'codex' $codexHome) {
     Write-Host 'Codex: not installed, skipped. Run this again once it is.'
 }
 
+if (-not $ApplySettings) {
+    Write-Host "Claude Code's settings.json was not touched. To merge claude\settings-overrides.json into it, run this with -ApplySettings."
+}
 Write-Host 'Done. New sessions pick this up. Sessions already running keep what they loaded.'
