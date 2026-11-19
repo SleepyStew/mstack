@@ -21,9 +21,10 @@ and show their work instead of describing it.
 
 ## The instructions
 
-`global/AGENTS.md` is loaded into every session, so it holds only what
-applies to almost every one. Anything narrower is a skill, or belongs in a
-project's own `AGENTS.md` or docs. It tells an agent how to:
+As you probably know, a global `AGENTS.md` is loaded into every session, so
+it should only hold what applies to almost every session. Anything narrower
+is a skill, or belongs in a project's own `AGENTS.md` or docs. Mine tells an
+agent how to:
 
 - keep me informed without padding, and ask me a question when a choice is
   a matter of preference instead of picking a default
@@ -31,21 +32,20 @@ project's own `AGENTS.md` or docs. It tells an agent how to:
   output
 - write the least code that solves the problem, comment only what the code
   can't say, and add tests where they would catch something
-- commit as it goes in small Conventional Commits, and never push, merge or
-  deploy unasked
+- commit as it goes in small Conventional Commits
 
 Most of that is about how to work and should suit anyone. The parts below
 are about me, so fork the repo and change them before you run setup:
 
-| Section | What to change |
-| --- | --- |
-| The opening lines | They name this repo as the file's home. Point them at your fork. |
-| Asking me questions | It prefers Claude Code's question tool to questions in the reply. Drop it if you would rather answer in text. |
-| Writing | British and Australian spelling, plain hyphens and day-first dates. Set your own spelling, punctuation and date format. |
-| Environment | My terminal runs zsh and secrets come through T3 Code. Name your own shell and the way you hand over secrets. |
-| Commits | Agents commit without asking, on the default branch too, with no co-author lines. Change this if you want to approve commits or keep the attribution. |
-| Package managers | pnpm for JavaScript and uv for Python. |
-| Deployment | Cloudflare Wrangler, and only when I ask. Replace it with how you deploy and what counts as production. |
+| Section             | What to change                                                                                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The opening lines   | They name this repo as the file's home. Point them at your fork.                                                                                                                                                               |
+| Asking me questions | It prefers Claude Code's question tool to questions in the reply. Drop it if you would rather answer in text.                                                                                                                  |
+| Writing             | British and Australian spelling, plain hyphens and day-first dates. Set your own spelling, punctuation and date format.                                                                                                        |
+| Environment         | My terminal runs zsh and secrets come through T3 Code. Name your own shell and the way you hand over secrets.                                                                                                                  |
+| Commits             | Agents commit without asking, on the default branch too, with no co-author lines, and never push or merge unasked. Change this if you want to approve commits, keep the attribution or let agents push and merge on their own. |
+| Package managers    | pnpm for JavaScript and uv for Python.                                                                                                                                                                                         |
+| Deployment          | Cloudflare Wrangler, and only when I ask. Replace it with how you deploy and what counts as production.                                                                                                                        |
 
 `claude/settings-overrides.json` is mine in the same way: the path to bash,
 the fullscreen interface, the advisor model and no attribution on commits or
