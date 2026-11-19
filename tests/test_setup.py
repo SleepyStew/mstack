@@ -1,4 +1,4 @@
-"""Run with: python3 -m unittest test_setup"""
+"""Run with: python3 -m unittest discover -s tests"""
 
 import json
 import os
@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parents[1]
 SKILLS = sorted(path.name for path in (REPO / "skills").iterdir() if path.is_dir())
 
 

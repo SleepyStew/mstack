@@ -13,9 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - run: python3 -m unittest discover -s skills/documentation/scripts
-      - run: python3 -m unittest discover -s claude
-      - run: python3 -m unittest test_setup
+      - run: python3 -m unittest discover -s tests
 
   windows:
     runs-on: windows-latest
@@ -23,9 +21,9 @@ jobs:
       - uses: actions/checkout@v7
       # Windows PowerShell 5.1 and PowerShell 7 write JSON differently.
       - name: Windows PowerShell 5.1
-        run: ./test_setup.ps1
+        run: ./tests/test_setup.ps1
         shell: powershell
       - name: PowerShell 7
         if: ${{ !cancelled() }}
-        run: ./test_setup.ps1
+        run: ./tests/test_setup.ps1
         shell: pwsh

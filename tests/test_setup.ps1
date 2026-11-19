@@ -1,11 +1,11 @@
 # Run setup.ps1 against scratch harness folders and check what it leaves.
 # Needs Developer Mode or an elevated shell, as setup.ps1 does.
 #
-# Run with: powershell -File test_setup.ps1
+# Run with: powershell -File tests/test_setup.ps1
 
 $ErrorActionPreference = 'Stop'
 
-$repo = $PSScriptRoot
+$repo = Split-Path $PSScriptRoot
 $root = Join-Path ([IO.Path]::GetTempPath()) "mstack-test-$([guid]::NewGuid())"
 $claude = Join-Path $root 'claude'
 $codex = Join-Path $root 'codex'

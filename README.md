@@ -108,14 +108,12 @@ After changing the docs checker, the settings merge or a setup script, run
 its tests:
 
 ```sh
-python3 -m unittest discover -s skills/documentation/scripts
-python3 -m unittest discover -s claude
-python3 -m unittest test_setup
+python3 -m unittest discover -s tests
 ```
 
-`test_setup.ps1` does the same for `setup.ps1` on Windows. CI runs all of
-them on every push to `main`, the Windows one under both Windows PowerShell
-and PowerShell 7.
+`tests/test_setup.ps1` does the same for `setup.ps1` on Windows. CI runs
+all of them on every push to `main`, the Windows one under both Windows
+PowerShell and PowerShell 7.
 
 ## Credits
 

@@ -1,8 +1,11 @@
-"""Run with: python3 -m unittest discover -s skills/documentation/scripts"""
+"""Run with: python3 -m unittest discover -s tests"""
 
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "skills/documentation/scripts"))
 
 from check_docs import check, slug
 

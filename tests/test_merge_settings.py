@@ -1,9 +1,12 @@
-"""Run with: python3 -m unittest discover -s claude"""
+"""Run with: python3 -m unittest discover -s tests"""
 
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "claude"))
 
 from merge_settings import apply, merge
 
