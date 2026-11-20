@@ -124,13 +124,13 @@ again.
 ```
 
 On Windows that is `remove.ps1`. It takes out the links that point into the
-clone and nothing else, so your own skills stay. Two things are left for
-you, because the script can't know what you want back:
+clone and nothing else, so your own skills stay. Where setup moved a file or
+folder of yours aside to make room for a link, such as your own `CLAUDE.md`,
+the newest copy in `mstack-backup/` is moved back.
 
-- Files that setup moved aside are still in `mstack-backup/` inside each
-  harness folder. Move back the ones you want.
-- `settings.json` keeps any overrides you applied. Its earlier versions are
-  in the same backup folder.
+`settings.json` keeps any overrides you applied, because it may have changed
+since and an old copy would lose that. Its earlier versions are in
+`mstack-backup/` inside the harness folder if you want one back.
 
 Then delete the clone.
 

@@ -79,6 +79,19 @@ class Setup(unittest.TestCase):
         self.assertEqual((self.claude / "settings.json").read_text(), settings)
         self.assertNotIn("removed", self.run_script("remove.sh"))
 
+    def test_remove_puts_back_the_newest_copy_setup_moved_aside(self):
+        old = self.codex / "mstack-backup/20200101-000000"
+        old.mkdir(parents=True)
+        (old / "AGENTS.md").write_text("older")
+        (self.codex / "AGENTS.md").write_text("mine")
+        (self.codex / "skills/why").mkdir(parents=True)
+        (self.codex / "skills/why/SKILL.md").write_text("mine")
+        self.run_setup("--apply-instructions")
+        self.assertIn("restored", self.run_script("remove.sh"))
+        self.assertEqual((self.codex / "AGENTS.md").read_text(), "mine")
+        self.assertEqual((self.codex / "skills/why/SKILL.md").read_text(), "mine")
+        self.assertEqual((old / "AGENTS.md").read_text(), "older")
+
     def test_second_run_changes_nothing(self):
         self.run_setup("--all")
         actions = [line.split()[0] for line in self.run_setup("--all").splitlines() if line.startswith("  ")]

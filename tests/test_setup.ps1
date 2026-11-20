@@ -95,7 +95,8 @@ try {
     Assert ((Read-Text $settings) -ceq $text) 'a second run leaves settings.json as it was'
 
     & (Join-Path $repo 'remove.ps1') 6>&1 | Out-Null
-    Assert (-not (Test-Path -LiteralPath (Join-Path $claude 'CLAUDE.md'))) 'remove takes out the CLAUDE.md link'
+    $restored = Get-Item -LiteralPath (Join-Path $claude 'CLAUDE.md') -Force
+    Assert (-not $restored.LinkType -and (Read-Text $restored.FullName) -ceq 'mine') 'remove puts back the CLAUDE.md that setup moved aside'
     Assert (-not (Test-Path -LiteralPath (Join-Path $codex 'AGENTS.md'))) 'remove takes out the Codex AGENTS.md link'
     Assert (@(Get-ChildItem -LiteralPath (Join-Path $codex 'skills') -Force).Count -eq 0) 'remove takes out the Codex skill links'
     $names = @((Get-ChildItem -LiteralPath $skills -Force).Name)
@@ -106,7 +107,7 @@ try {
     [IO.File]::WriteAllText($settings, $seed, $utf8)
     Invoke-Setup | Out-Null
     Assert ((Read-Text $settings) -ceq $seed) 'setup without -ApplySettings leaves settings.json as it was'
-    Assert (-not (Test-Path -LiteralPath (Join-Path $claude 'CLAUDE.md'))) 'setup without -ApplyInstructions links no CLAUDE.md'
+    Assert ((Read-Text (Join-Path $claude 'CLAUDE.md')) -ceq 'mine') 'setup without -ApplyInstructions leaves CLAUDE.md as it was'
     Assert (-not (Test-Path -LiteralPath (Join-Path $codex 'AGENTS.md'))) 'setup without -ApplyInstructions links no Codex AGENTS.md'
 
     Write-Host "setup.ps1 tests passed on PowerShell $($PSVersionTable.PSVersion)"
