@@ -67,8 +67,8 @@ text choppy and harder to read.
 
 ## House rules
 
-These come from the user's global instructions and apply to everything
-edited here.
+These are the defaults for everything edited here. Where the user's
+instructions or the project set a different convention, follow that.
 
 - British or Australian spelling, unless the project's prose is already
   American.

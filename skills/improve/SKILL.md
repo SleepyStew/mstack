@@ -17,8 +17,7 @@ anything they must read first in the reply above it.
 
 - Read `AGENTS.md` or `CLAUDE.md`, the README, the docs index, the package
   manifest, the open tasks and the recent history.
-- Run the app and use it as a user would, when you can. The global rules give
-  you permission.
+- Run the app and use it as a user would, when you can.
 - Then ask the user two things: which areas they care about this time, and
   how big a change they have appetite for. Skip a question the request has
   already answered.
@@ -71,7 +70,7 @@ For each approved suggestion:
    quick prototype can settle a choice, build the prototype and show both
    options instead of asking in the abstract.
 2. Build the smallest version that delivers the benefit, in its own commits.
-   The global rules on code, tests and commits apply.
+   The user's and the project's rules on code, tests and commits apply.
 3. Hand it back with evidence, per the `evidence` skill.
 4. Ask whether to continue to the next one, change course or stop.
 

@@ -65,8 +65,8 @@ them all. For a slowdown, measure a baseline and bisect instead of logging.
 Fix the cause, not where it shows. A guard that hides the symptom is not a
 fix.
 
-When the global rules call for a regression test, turn the shrunk repro into
-one at a level where it exercises the real bug. Watch it fail before the fix
+When the bug could plausibly come back, turn the shrunk repro into a
+regression test at a level where it exercises the real bug. Watch it fail before the fix
 and pass after. If the only place a test fits is too shallow to reproduce
 the bug, say so instead of writing a test that would pass anyway.
 
