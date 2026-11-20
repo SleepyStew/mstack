@@ -9,8 +9,12 @@ permissions:
   contents: read
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  unix:
+    strategy:
+      matrix:
+        # macOS ships bash 3.2 and keeps bash at another path.
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
       - run: python3 -m unittest discover -s tests
