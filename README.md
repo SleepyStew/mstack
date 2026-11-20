@@ -13,6 +13,7 @@ and show their work instead of describing it.
 | `why`           | Code shows what it does and rarely why. The answer comes from the commits, pull requests and issues behind it, with the agent's own inferences marked.                                                             |
 | `evidence`      | I review what an agent shows, not what it says. At handoff it captures screenshots, a recording or real command output as proof.                                                                                   |
 | `review-loop`   | A change is more likely to be correct once a second model has reviewed it. GPT Sol reviews in a loop until both agents agree. Needs a harness that can run GPT Sol, which T3 Code does with `delegate_task`.     |
+| `hillclimb`     | Polish has no finish line, and an agent grades its own work kindly. We agree scored criteria, then it improves a screen or flow in rounds until GPT Sol scores every criterion at the bar. Needs GPT Sol too.      |
 | `cleanup`       | Repos collect dead code, slop and misleading comments. The agent surveys the repo, proposes a plan, then cleans up the approved parts with no change in behaviour.                                                 |
 | `improve`       | Improvements change behaviour, so I choose them. The agent suggests, I pick, and it builds one approved change at a time.                                                                                          |
 | `unslop`        | Prose from an agent reads as generated. This edits out the AI writing patterns without changing the meaning or the voice.                                                                                          |
@@ -176,6 +177,8 @@ Some skills are adapted from these projects:
 `cleanup`, `evidence` and `documentation` take ideas from pstack's `correct`,
 `prove-it-works` and `technical-writing` skills and from tstack's
 `full-send`.
+`hillclimb` takes ideas from the Hillclimb and Eval playbooks in pstack's
+`poteto-mode` and from tstack's `council` and `full-send`.
 
 The adapted parts are under the MIT licence in [LICENSE](LICENSE), with the
 copyright lines above.
