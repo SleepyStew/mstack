@@ -1,22 +1,28 @@
-# Link mstack into Claude Code and Codex on Windows. Safe to run again.
+# Link mstack's skills into Claude Code and Codex on Windows. Safe to run again.
 #
-# The instructions and skills are links into this clone, so `git pull` updates
-# them. Run this again after a pull adds or removes a skill. A file or folder
-# already in the way is moved to <harness dir>\mstack-backup\<timestamp>\,
-# never deleted. A link in the way is replaced. remove.ps1 takes the links out.
+# The skills are links into this clone, so `git pull` updates them. Run this
+# again after a pull adds or removes a skill. A file or folder already in the
+# way is moved to <harness dir>\mstack-backup\<timestamp>\, never deleted. A
+# link in the way is replaced. remove.ps1 takes the links out.
 #
-# With -ApplySettings, the keys in claude\settings-overrides.json are also
-# merged into Claude Code's settings.json, which stays a regular file and is
-# copied to the backup folder before it changes. Settings are personal, so
-# they are left alone unless asked for.
+# The global instructions and the settings are personal, so they are left
+# alone unless asked for:
+#   -ApplyInstructions  link global\AGENTS.md in as the global instructions
+#   -ApplySettings      merge claude\settings-overrides.json into Claude Code's
+#                       settings.json, which stays a regular file and is copied
+#                       to the backup folder before it changes
+#   -All                both of the above
+#   -DryRun             print what a run would do and change nothing
 #
 # Skill folders are linked as junctions, which need no special rights. The
 # instruction files are symbolic links, which need Developer Mode (Settings >
 # System > For developers) or an elevated shell.
 
-param([switch]$ApplySettings)
+param([switch]$ApplyInstructions, [switch]$ApplySettings, [switch]$All, [switch]$DryRun)
 
 $ErrorActionPreference = 'Stop'
+
+if ($All) { $ApplyInstructions = $true; $ApplySettings = $true }
 
 $repo = $PSScriptRoot
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
@@ -39,13 +45,19 @@ function Add-Link($Source, $Target, $HarnessHome, [switch]$Directory) {
     }
     if ($item -and $item.LinkType) {
         # A link pointing somewhere else. Deleting a link leaves its target alone.
-        $item.Delete()
+        if (-not $DryRun) { $item.Delete() }
     } elseif ($item) {
         $relative = $Target.Substring($HarnessHome.Length).TrimStart('\')
         $backup = Join-Path $HarnessHome (Join-Path "mstack-backup\$stamp" $relative)
-        New-Item -ItemType Directory -Force -Path (Split-Path $backup) | Out-Null
-        Move-Item -LiteralPath $Target -Destination $backup
+        if (-not $DryRun) {
+            New-Item -ItemType Directory -Force -Path (Split-Path $backup) | Out-Null
+            Move-Item -LiteralPath $Target -Destination $backup
+        }
         Write-Host "  backup  $Target -> $backup"
+    }
+    if ($DryRun) {
+        Write-Host "  linked  $Target"
+        return
     }
     New-Item -ItemType Directory -Force -Path (Split-Path $Target) | Out-Null
     if ($Directory) {
@@ -67,11 +79,11 @@ function Add-SkillLinks($HarnessHome) {
         Add-Link $skill.FullName (Join-Path $skills $skill.Name) $HarnessHome -Directory
     }
     $ours = (Join-Path $repo 'skills') + '\'
-    foreach ($entry in Get-ChildItem -LiteralPath $skills -Force) {
+    foreach ($entry in Get-ChildItem -LiteralPath $skills -Force -ErrorAction SilentlyContinue) {
         if (-not $entry.LinkType) { continue }
         $target = @($entry.Target)[0]
         if ($target -and $target.StartsWith($ours, [StringComparison]::OrdinalIgnoreCase) -and -not (Test-Path -LiteralPath $target)) {
-            $entry.Delete()
+            if (-not $DryRun) { $entry.Delete() }
             Write-Host "  removed $($entry.FullName) (skill no longer in mstack)"
         }
     }
@@ -93,6 +105,10 @@ function Merge-Object($Base, $Overrides) {
 
 function Merge-Settings($HarnessHome) {
     $target = Join-Path $HarnessHome 'settings.json'
+    if ($DryRun) {
+        Write-Host "  merge   $target (a dry run does not compare it)"
+        return
+    }
     # PowerShell 6 and later read a string that looks like a timestamp as a
     # date and write it back in another form. Only 7.5 and later can be told
     # to keep it a string.
@@ -149,7 +165,7 @@ $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USER
 
 if (Test-Installed 'claude' $claudeHome) {
     Write-Host "Claude Code ($claudeHome)"
-    Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $claudeHome 'CLAUDE.md') $claudeHome
+    if ($ApplyInstructions) { Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $claudeHome 'CLAUDE.md') $claudeHome }
     if ($ApplySettings) { Merge-Settings $claudeHome }
     Add-SkillLinks $claudeHome
 } else {
@@ -158,13 +174,20 @@ if (Test-Installed 'claude' $claudeHome) {
 
 if (Test-Installed 'codex' $codexHome) {
     Write-Host "Codex ($codexHome)"
-    Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $codexHome 'AGENTS.md') $codexHome
+    if ($ApplyInstructions) { Add-Link (Join-Path $repo 'global\AGENTS.md') (Join-Path $codexHome 'AGENTS.md') $codexHome }
     Add-SkillLinks $codexHome
 } else {
     Write-Host 'Codex: not installed, skipped. Run this again once it is.'
 }
 
+if (-not $ApplyInstructions) {
+    Write-Host 'Your global instructions were not touched. To link global\AGENTS.md in as them, run this with -ApplyInstructions.'
+}
 if (-not $ApplySettings) {
     Write-Host "Claude Code's settings.json was not touched. To merge claude\settings-overrides.json into it, run this with -ApplySettings."
 }
-Write-Host 'Done. New sessions pick this up. Sessions already running keep what they loaded.'
+if ($DryRun) {
+    Write-Host 'Dry run: nothing was changed. The lines above are what a real run would do.'
+} else {
+    Write-Host 'Done. New sessions pick this up. Sessions already running keep what they loaded.'
+}

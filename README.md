@@ -34,8 +34,10 @@ agent how to:
   can't say, and add tests where they would catch something
 - commit as it goes in small Conventional Commits
 
-Most of that is about how to work and should suit anyone. The parts below
-are about me, so fork the repo and change them before you run setup:
+Setup leaves your own global instructions alone unless you run it with
+`--apply-instructions`. Most of the file is about how to work and should
+suit anyone. The parts below are about me, so fork the repo and change them
+before you do:
 
 | Section             | What to change                                                                                                                                                                                                                 |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -50,7 +52,7 @@ are about me, so fork the repo and change them before you run setup:
 `claude/settings-overrides.json` is mine in the same way: bash as the shell,
 the fullscreen interface, the advisor model and no attribution on commits or
 pull requests. Setup leaves your Claude Code settings alone unless you run
-it with `--apply-settings`, so edit the file before you do.
+it with `--apply-settings`, so edit that file first too.
 
 ## Set up
 
@@ -61,19 +63,21 @@ git clone https://github.com/SleepyStew/mstack ~/Code/mstack
 ~/Code/mstack/setup.sh
 ```
 
-On Windows, run `setup.ps1` in PowerShell instead. File links there need
-Developer Mode or an elevated shell.
+On Windows, run `setup.ps1` in PowerShell instead.
 
-The script links these into place, for each harness that is installed:
+That links the skills into each harness that is installed, as
+`~/.claude/skills/<name>` and `~/.codex/skills/<name>`, and touches nothing
+else. The instructions and the settings are personal, so each needs a flag:
 
-| Link                        | Points at                             |
-| --------------------------- | ------------------------------------- |
-| `~/.claude/CLAUDE.md`     | `global/AGENTS.md`                  |
-| `~/.claude/skills/<name>` | `skills/<name>`, one link per skill |
-| `~/.codex/AGENTS.md`      | `global/AGENTS.md`                  |
-| `~/.codex/skills/<name>`  | `skills/<name>`, one link per skill |
+| `setup.sh`               | `setup.ps1`          | What it adds                                                                                  |
+| ------------------------ | -------------------- | --------------------------------------------------------------------------------------------- |
+| `--apply-instructions` | `-ApplyInstructions` | Links `global/AGENTS.md` in as `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`.              |
+| `--apply-settings`     | `-ApplySettings`     | Merges `claude/settings-overrides.json` into `~/.claude/settings.json`. See [Settings](#settings). |
+| `--all`                | `-All`               | Both of the above. This is what I run on my own machines.                                     |
+| `--dry-run`            | `-DryRun`            | Prints what the run would do and changes nothing. Combine it with the others.                 |
 
-`CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected when set.
+`CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected when set. On Windows,
+linking the instructions needs Developer Mode or an elevated shell.
 
 - **Files and folders are never deleted.** One already in the way moves to
   `mstack-backup/<timestamp>/` inside the same harness folder. A link in the
@@ -88,15 +92,7 @@ loaded.
 
 ### Settings
 
-Setup leaves Claude Code's settings alone, because they are more personal
-than the instructions and skills. To also merge
-`claude/settings-overrides.json` into `~/.claude/settings.json`, ask for it:
-
-```sh
-~/Code/mstack/setup.sh --apply-settings
-```
-
-On Windows that is `setup.ps1 -ApplySettings`. Codex gets no settings.
+`--apply-settings` is for Claude Code only. Codex gets no settings.
 
 `settings.json` stays a regular file that Claude Code and you can edit, and
 it is copied to the backup folder before a merge changes it. It is merged
@@ -116,10 +112,10 @@ git -C ~/Code/mstack pull
 ```
 
 A pull updates the instructions and skills, since they are links into the
-clone. Run setup again when a pull adds or removes a skill: it links the new
-skill and removes the link to the one that went. If you apply the settings,
-run it with `--apply-settings` when a pull changes
-`claude/settings-overrides.json`.
+clone. Run setup again, with the flags you used before, when a pull adds or
+removes a skill or changes `claude/settings-overrides.json`: it links the
+new skill, removes the link to the one that went and merges the overrides
+again.
 
 ## Remove
 

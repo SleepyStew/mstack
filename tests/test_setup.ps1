@@ -34,6 +34,12 @@ $env:CODEX_HOME = $codex
 try {
     New-Item -ItemType Directory -Force -Path $skills, $codex, $elsewhere, (Join-Path $skills 'theirs') | Out-Null
     [IO.File]::WriteAllText((Join-Path $claude 'CLAUDE.md'), 'mine', $utf8)
+
+    Invoke-Setup -All -DryRun | Out-Null
+    Assert ((Read-Text (Join-Path $claude 'CLAUDE.md')) -ceq 'mine') 'a dry run leaves CLAUDE.md as it was'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $claude 'mstack-backup'))) 'a dry run makes no backup'
+    Assert (@(Get-ChildItem -LiteralPath $codex -Force).Count -eq 0) 'a dry run links nothing'
+
     New-Item -ItemType Junction -Path (Join-Path $skills 'why') -Target $elsewhere | Out-Null
     # A link to a skill that mstack no longer has.
     cmd /c mklink /J (Join-Path $skills 'gone') (Join-Path $repo 'skills\gone') | Out-Null
@@ -44,7 +50,7 @@ try {
     $seed = '{"theme": "light", "note": "' + $note + '", "when": "' + $when + '", "env": {"KEEP": "1"}, "list": [1]}'
     [IO.File]::WriteAllText($settings, $seed, $utf8)
 
-    Invoke-Setup -ApplySettings | Out-Null
+    Invoke-Setup -All | Out-Null
 
     $instructions = Get-Item -LiteralPath (Join-Path $claude 'CLAUDE.md') -Force
     Assert ($instructions.LinkType -eq 'SymbolicLink') 'CLAUDE.md is a symbolic link'
@@ -84,7 +90,7 @@ try {
     }
     Assert ($text -match '"list":\s*\[\s*1\s*\]') 'a one-item list stays a list'
 
-    $changed = @(Invoke-Setup -ApplySettings | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
+    $changed = @(Invoke-Setup -All | Where-Object { $_ -match '^  ' -and $_ -notmatch '^  ok ' })
     Assert ($changed.Count -eq 0) "a second run changes nothing, but it printed: $changed"
     Assert ((Read-Text $settings) -ceq $text) 'a second run leaves settings.json as it was'
 
@@ -100,6 +106,8 @@ try {
     [IO.File]::WriteAllText($settings, $seed, $utf8)
     Invoke-Setup | Out-Null
     Assert ((Read-Text $settings) -ceq $seed) 'setup without -ApplySettings leaves settings.json as it was'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $claude 'CLAUDE.md'))) 'setup without -ApplyInstructions links no CLAUDE.md'
+    Assert (-not (Test-Path -LiteralPath (Join-Path $codex 'AGENTS.md'))) 'setup without -ApplyInstructions links no Codex AGENTS.md'
 
     Write-Host "setup.ps1 tests passed on PowerShell $($PSVersionTable.PSVersion)"
 } finally {
